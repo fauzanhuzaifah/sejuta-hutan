@@ -66,3 +66,88 @@ Stage Summary:
 
 ---
 
+Task ID: 3
+Agent: Z.ai Code
+Task: Tahap 3 - Buat API endpoint untuk menyimpan data peserta ke database
+
+Work Log:
+- Membuat directory src/app/api/peserta/
+- Membuat API route handler di src/app/api/peserta/route.ts dengan:
+  * POST endpoint untuk menyimpan peserta baru
+  * GET endpoint untuk mengambil daftar peserta (untuk admin)
+- Implementasi POST endpoint:
+  * Parse request body dan validasi field required (nama, email, telepon, alamat)
+  * Validasi format email menggunakan regex
+  * Validasi format nomor telepon Indonesia (08xx, 628xx, +628xx)
+  * Validasi jumlah_pohon (1-1000)
+  * Cek duplikasi email sebelum insert
+  * Insert data ke database menggunakan Prisma
+  * Set status default = 'pending'
+  * Response sukses dengan data peserta yang disimpan
+- Implementasi GET endpoint:
+  * Support query parameters: status, limit, offset
+  * Filter berdasarkan status (pending/confirmed/completed)
+  * Pagination dengan limit maksimal 100
+  * Return data peserta dan metadata pagination
+- Error handling:
+  * Field validation errors (400)
+  * Duplicate email error (409)
+  * Database connection errors (503)
+  * Generic server errors (500)
+- API endpoint berhasil di-compile tanpa error
+
+Stage Summary:
+- API endpoint POST /api/peserta berfungsi untuk pendaftaran peserta
+- API endpoint GET /api/peserta berfungsi untuk mengambil data peserta
+- Validasi input lengkap dan aman
+- Error handling yang baik
+- Siap digunakan oleh frontend
+
+---
+
+Task ID: 4
+Agent: Z.ai Code
+Task: Tahap 4 - Integrasi form dengan API dan tambahkan validasi
+
+Work Log:
+- Menambahkan TypeScript interfaces untuk FormData dan FormErrors
+- Mengimpor icon tambahan: AlertCircle, Loader2
+- Implementasi validasi client-side:
+  * isValidEmail() - validasi format email dengan regex
+  * isValidPhone() - validasi nomor telepon Indonesia (08xx, 628xx, +628xx)
+  * validateForm() - validasi lengkap sebelum submit
+    - Nama: required, min 3 karakter
+    - Email: required, format valid
+    - Telepon: required, format Indonesia
+    - Alamat: required, min 10 karakter
+- Mengimplementasikan handleInputChange():
+  * Update form data
+  * Clear error untuk field saat user mengetik
+- Mengupdate handleSubmit():
+  * Reset errors sebelum validasi
+  * Validasi form sebelum submit
+  * Parse response JSON dari API
+  * Handle API error messages dan mapping ke field yang tepat
+  * Error handling untuk koneksi gagal
+- Menambahkan useEffect untuk auto-reset success message setelah 10 detik
+- Update UI form dengan:
+  * Error messages per field dengan icon AlertCircle
+  * Border berubah menjadi merah saat ada error
+  * General error message di atas form
+  * Success message dengan pesan dari API
+  * Character counter untuk field pesan
+  * Loading indicator dengan icon Loader2 yang berputar
+  * Button text berubah saat submitting
+  * Helper text untuk format telepon dan alamat
+- Semua perubahan berhasil di-compile tanpa error
+
+Stage Summary:
+- Form terintegrasi sepenuhnya dengan API endpoint
+- Validasi client-side dan server-side lengkap
+- User feedback yang jelas untuk error dan success
+- User experience yang optimal dengan loading states
+- Auto-clear error saat user mulai mengetik
+- Auto-reset success message setelah 10 detik
+
+---
+

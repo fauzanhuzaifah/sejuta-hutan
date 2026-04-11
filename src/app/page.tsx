@@ -1,15 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Leaf, TreePine, Flame, Heart, Users, Sprout, Globe, Shield, Sun, Wind, Droplets, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Leaf, TreePine, Flame, Heart, Users, Sprout, Globe, Shield, Sun, Wind, Droplets, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+
+interface FormData {
+  nama: string;
+  email: string;
+  telepon: string;
+  alamat: string;
+  jumlah_pohon: number;
+  pesan: string;
+}
+
+interface FormErrors {
+  nama?: string;
+  email?: string;
+  telepon?: string;
+  alamat?: string;
+  general?: string;
+}
 
 export default function LandingPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     nama: '',
     email: '',
     telepon: '',
@@ -18,11 +35,82 @@ export default function LandingPage() {
     pesan: ''
   });
 
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Auto-reset success message after 10 seconds
+  useEffect(() => {
+    if (submitStatus === 'success') {
+      const timer = setTimeout(() => {
+        setSubmitStatus('idle');
+        setSuccessMessage('');
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitStatus]);
+
+  // Validasi email format
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Validasi nomor telepon Indonesia
+  const isValidPhone = (phone: string): boolean => {
+    const phoneRegex = /^(\+62|62|0)8[1-9][0-9]{6,11}$/;
+    return phoneRegex.test(phone.replace(/[\s-]/g, ''));
+  };
+
+  // Validasi form sebelum submit
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Validasi nama
+    if (!formData.nama.trim()) {
+      newErrors.nama = 'Nama lengkap harus diisi';
+    } else if (formData.nama.trim().length < 3) {
+      newErrors.nama = 'Nama lengkap minimal 3 karakter';
+    }
+
+    // Validasi email
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email harus diisi';
+    } else if (!isValidEmail(formData.email)) {
+      newErrors.email = 'Format email tidak valid';
+    }
+
+    // Validasi telepon
+    if (!formData.telepon.trim()) {
+      newErrors.telepon = 'Nomor telepon harus diisi';
+    } else if (!isValidPhone(formData.telepon)) {
+      newErrors.telepon = 'Format nomor telepon tidak valid. Gunakan format: 08xxxxxxxxxx';
+    }
+
+    // Validasi alamat
+    if (!formData.alamat.trim()) {
+      newErrors.alamat = 'Alamat domisili harus diisi';
+    } else if (formData.alamat.trim().length < 10) {
+      newErrors.alamat = 'Alamat terlalu singkat, mohon masukkan alamat lengkap';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Reset previous errors and status
+    setErrors({});
+    setSubmitStatus('idle');
+
+    // Validasi form
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -34,8 +122,13 @@ export default function LandingPage() {
         body: JSON.stringify(formData),
       });
 
+      const result = await response.json();
+
       if (response.ok) {
         setSubmitStatus('success');
+        setSuccessMessage(result.message || 'Pendaftaran berhasil!');
+
+        // Reset form
         setFormData({
           nama: '',
           email: '',
@@ -44,13 +137,37 @@ export default function LandingPage() {
           jumlah_pohon: 1,
           pesan: ''
         });
+        setErrors({});
       } else {
+        // Handle API errors
         setSubmitStatus('error');
+
+        if (result.message) {
+          // Cek jika error terkait field spesifik
+          if (result.message.toLowerCase().includes('email')) {
+            setErrors({ ...errors, email: result.message, general: '' });
+          } else if (result.message.toLowerCase().includes('telepon')) {
+            setErrors({ ...errors, telepon: result.message, general: '' });
+          } else {
+            setErrors({ general: result.message });
+          }
+        } else {
+          setErrors({ general: 'Terjadi kesalahan. Silakan coba lagi.' });
+        }
       }
     } catch (error) {
       setSubmitStatus('error');
+      setErrors({ general: 'Terjadi kesalahan koneksi. Silakan periksa internet Anda dan coba lagi.' });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (field: keyof FormData, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error for this field when user starts typing
+    if (errors[field as keyof FormErrors]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -329,16 +446,44 @@ export default function LandingPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* General Error Message */}
+                  {errors.general && (
+                    <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                        <p className="text-red-800 font-semibold">{errors.general}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Success Message */}
+                  {submitStatus === 'success' && (
+                    <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-green-800 font-semibold">Terima kasih! Pendaftaran Anda berhasil.</p>
+                          <p className="text-green-600 text-sm mt-1">{successMessage || 'Kami akan menghubungi Anda segera untuk informasi selanjutnya.'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="space-y-2">
                     <Label htmlFor="nama" className="text-green-700">Nama Lengkap *</Label>
                     <Input
                       id="nama"
                       placeholder="Masukkan nama lengkap Anda"
                       value={formData.nama}
-                      onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                      required
-                      className="border-green-200 focus:border-green-500"
+                      onChange={(e) => handleInputChange('nama', e.target.value)}
+                      className={errors.nama ? 'border-red-500 focus:border-red-500' : 'border-green-200 focus:border-green-500'}
                     />
+                    {errors.nama && (
+                      <p className="text-red-600 text-sm flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        {errors.nama}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -348,10 +493,15 @@ export default function LandingPage() {
                       type="email"
                       placeholder="contoh@email.com"
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      required
-                      className="border-green-200 focus:border-green-500"
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className={errors.email ? 'border-red-500 focus:border-red-500' : 'border-green-200 focus:border-green-500'}
                     />
+                    {errors.email && (
+                      <p className="text-red-600 text-sm flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        {errors.email}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -361,27 +511,38 @@ export default function LandingPage() {
                       type="tel"
                       placeholder="08xxxxxxxxxx"
                       value={formData.telepon}
-                      onChange={(e) => setFormData({ ...formData, telepon: e.target.value })}
-                      required
-                      className="border-green-200 focus:border-green-500"
+                      onChange={(e) => handleInputChange('telepon', e.target.value)}
+                      className={errors.telepon ? 'border-red-500 focus:border-red-500' : 'border-green-200 focus:border-green-500'}
                     />
+                    {errors.telepon && (
+                      <p className="text-red-600 text-sm flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        {errors.telepon}
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-500">Format: 08xxxxxxxxxx atau 628xxxxxxxxxx</p>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="alamat" className="text-green-700">Alamat Domisili *</Label>
                     <Textarea
                       id="alamat"
-                      placeholder="Masukkan alamat lengkap domisili Anda"
+                      placeholder="Masukkan alamat lengkap domisili Anda (jalan, RT/RW, kelurahan, kecamatan, kota)"
                       value={formData.alamat}
-                      onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
-                      required
-                      className="border-green-200 focus:border-green-500 min-h-[100px]"
+                      onChange={(e) => handleInputChange('alamat', e.target.value)}
+                      className={errors.alamat ? 'border-red-500 focus:border-red-500 min-h-[100px]' : 'border-green-200 focus:border-green-500 min-h-[100px]'}
                     />
+                    {errors.alamat && (
+                      <p className="text-red-600 text-sm flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        {errors.alamat}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="jumlah_pohon" className="text-green-700">
-                      Jumlah Pohon yang Ingin Ditanam: {formData.jumlah_pohon}
+                      Jumlah Pohon yang Ingin Ditanam: <span className="font-bold text-green-800">{formData.jumlah_pohon}</span>
                     </Label>
                     <Input
                       id="jumlah_pohon"
@@ -389,11 +550,12 @@ export default function LandingPage() {
                       min="1"
                       max="100"
                       value={formData.jumlah_pohon}
-                      onChange={(e) => setFormData({ ...formData, jumlah_pohon: parseInt(e.target.value) })}
+                      onChange={(e) => handleInputChange('jumlah_pohon', parseInt(e.target.value))}
                       className="accent-green-600"
                     />
                     <div className="flex justify-between text-sm text-gray-500">
                       <span>1</span>
+                      <span>50</span>
                       <span>100</span>
                     </div>
                   </div>
@@ -404,33 +566,28 @@ export default function LandingPage() {
                       id="pesan"
                       placeholder="Berikan pesan atau motivasi Anda untuk berpartisipasi..."
                       value={formData.pesan}
-                      onChange={(e) => setFormData({ ...formData, pesan: e.target.value })}
+                      onChange={(e) => handleInputChange('pesan', e.target.value)}
                       className="border-green-200 focus:border-green-500 min-h-[80px]"
                     />
+                    <p className="text-xs text-gray-500">{formData.pesan.length}/500 karakter</p>
                   </div>
-
-                  {submitStatus === 'success' && (
-                    <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center">
-                      <CheckCircle2 className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                      <p className="text-green-800 font-semibold">Terima kasih! Pendaftaran Anda berhasil.</p>
-                      <p className="text-green-600 text-sm">Kami akan menghubungi Anda segera untuk informasi selanjutnya.</p>
-                    </div>
-                  )}
-
-                  {submitStatus === 'error' && (
-                    <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 text-center">
-                      <p className="text-red-800 font-semibold">Maaf, terjadi kesalahan.</p>
-                      <p className="text-red-600 text-sm">Silakan coba lagi atau hubungi admin.</p>
-                    </div>
-                  )}
 
                   <Button
                     type="submit"
                     disabled={isSubmitting}
                     className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6"
                   >
-                    {isSubmitting ? 'Mengirim...' : 'Daftar Sekarang'}
-                    {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Mengirim Data...
+                      </>
+                    ) : (
+                      <>
+                        Daftar Sekarang
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </>
+                    )}
                   </Button>
 
                   <p className="text-sm text-gray-500 text-center">
