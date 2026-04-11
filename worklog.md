@@ -35,3 +35,34 @@ Stage Summary:
 
 ---
 
+Task ID: 2
+Agent: Z.ai Code
+Task: Tahap 2 - Setup database PostgreSQL Neon dan migrasi data CSV
+
+Work Log:
+- Mencari file CSV peserta_sejuta_pohon_formatted.csv di project (tidak ditemukan)
+- Mengupdate file .env dengan connection string PostgreSQL Neon:
+  * postgresql://neondb_owner:npg_2eWGNaKP8LZi@ep-crimson-tooth-a1xgngig-pooler.ap-southeast-1.aws.neon.tech/neondb
+- Mengupdate prisma/schema.prisma:
+  * Mengubah provider dari sqlite ke postgresql
+  * Menghapus model User dan Post yang tidak diperlukan
+  * Membuat model Peserta dengan field: id, nama, email, telepon, alamat, jumlahPohon, pesan, status, createdAt, updatedAt
+  * Menambahkan index pada email dan status untuk optimasi query
+- Melakukan migrasi database dengan `bun run db:push`:
+  * Berhasil membuat tabel Peserta di PostgreSQL Neon
+  * Generate Prisma Client berhasil
+- Membuat script import CSV di scripts/import-csv.ts:
+  * Fungsi parseCSV untuk membaca file CSV
+  * Fungsi importCSVToDatabase untuk mengimport data ke database
+  * Error handling dan progress logging
+  * Support untuk field: nama, email, telepon, alamat, jumlahPohon, pesan
+
+Stage Summary:
+- Database PostgreSQL Neon berhasil dikonfigurasi
+- Schema Prisma sesuai dengan form pendaftaran
+- Migrasi database berhasil dilakukan
+- Script import CSV siap digunakan ketika file CSV tersedia
+- Script dapat dijalankan dengan: `bun run scripts/import-csv.ts`
+
+---
+
