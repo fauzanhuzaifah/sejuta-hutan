@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { TreePine, Users, Map, Wind, BarChart3, Award, UsersRound, BookOpen, Smile, ThermometerSun, Droplets, CloudHail, Fish, Waves, HeartCrack, Menu, X, Send, CheckCircle, AlertCircle, Loader2, Globe, Shield, Sun as SunIcon, Moon, Info, HeartHandshake, Search, ChevronLeft, ChevronRight, Filter, FileText, CheckCircle2, Sprout, ShieldCheck, Award as AwardIcon, Calendar, MapPin, MessageCircle, Heart, Clock } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { use } from 'react';
@@ -327,8 +327,60 @@ export default function LandingPage() {
   const [komentarSuccess, setKomentarSuccess] = useState('');
   const [komentarTotalCount, setKomentarTotalCount] = useState(0);
 
+  // State untuk lazy image dan animated numbers
+  const statsSectionRef = useRef<HTMLDivElement>(null);
+  const [statsVisible, setStatsVisible] = useState(false);
+  const [displayVolunteerCount, setDisplayVolunteerCount] = useState(0);
+  const [displayTreeCount, setDisplayTreeCount] = useState(0);
+
   useEffect(() => setMounted(true), []);
 
+
+  // Lazy load animation for stats section
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStatsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    
+    if (statsSectionRef.current) {
+      observer.observe(statsSectionRef.current);
+    }
+    
+    return () => observer.disconnect();
+  }, []);
+
+  // Animated counter effect
+  useEffect(() => {
+    if (!statsVisible) return;
+    
+    const targetVolunteer = totalCount > 0 ? totalCount : pesertaList.length;
+    const targetTree = totalTreesCount;
+    
+    const duration = 2000; // 2 seconds
+    const startTime = performance.now();
+    
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Ease-out quart function for smooth animation
+      const easeOut = 1 - Math.pow(1 - progress, 4);
+      
+      setDisplayVolunteerCount(Math.floor(targetVolunteer * easeOut));
+      setDisplayTreeCount(Math.floor(targetTree * easeOut));
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }, [statsVisible, totalCount, totalTreesCount, pesertaList.length]);
   useEffect(() => {
     fetchPeserta();
     fetchKomentar();
@@ -1149,7 +1201,7 @@ export default function LandingPage() {
             </div>
 
             {/* Sidebar Stats */}
-            <div className="lg:col-span-2 space-y-6">
+            <div ref={statsSectionRef} className="lg:col-span-2 space-y-6">
               <div className={`rounded-3xl p-6 ${theme === 'dark' ? 'bg-gradient-to-br from-green-900/80 to-[#022c17] border border-green-700/30' : 'bg-white border border-green-200 shadow-lg'}`}>
                 <h4 className={`font-bold text-sm mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-green-200' : 'text-green-800'}`}>
                   <BarChart3 className={`w-4 h-4 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`} />
@@ -1158,7 +1210,7 @@ export default function LandingPage() {
                 <div className="text-center">
                   <p className={`text-5xl font-extrabold ${theme === 'dark' ? 'text-green-200' : 'text-green-800'}`}>{progressPercent.toFixed(1)}%</p>
                   <p className={`text-lg font-semibold mt-2 ${theme === 'dark' ? 'text-green-300' : 'text-green-700'}`}>
-                    {displayCount.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')} <span className={`text-sm font-normal ${theme === 'dark' ? 'text-green-500' : 'text-green-600'}`}>/ 10,000 {t.labels.registeredVolunteers}</span>
+                    {displayVolunteerCount.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')} <span className={`text-sm font-normal ${theme === 'dark' ? 'text-green-500' : 'text-green-600'}`}>/ 10,000 {t.labels.registeredVolunteers}</span>
                   </p>
                 </div>
               </div>
@@ -1168,7 +1220,7 @@ export default function LandingPage() {
                   <TreePine className={`w-4 h-4 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`} />
                   <span>{t.labels.totalTrees}</span>
                 </h4>
-                <p className={`text-4xl font-extrabold ${theme === 'dark' ? 'text-green-200' : 'text-green-800'}`}>{totalTrees.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</p>
+                <p className={`text-4xl font-extrabold ${theme === 'dark' ? 'text-green-200' : 'text-green-800'}`}>{displayTreeCount.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</p>
                 <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-green-500' : 'text-green-600'}`}>{t.labels.treesRegistered}</p>
               </div>
             </div>
