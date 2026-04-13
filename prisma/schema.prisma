@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,20 +5,32 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = "postgresql://neondb_owner:npg_2eWGNaKP8LZi@ep-crimson-tooth-a1xgngig-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 }
 
-model Peserta {
-  id          String   @id @default(cuid())
-  nama        String
-  email       String
-  telepon     String
-  alamat      String
-  jumlahPohon Int      @default(1)
-  pesan       String?
-  status      String   @default("pending") // pending, confirmed, completed
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model peserta {
+  id           Int       @id @default(autoincrement())
+  nama         String
+  whatsapp     String?
+  email        String?   @unique
+  usia         Int?
+  alamat       String?
+  pekerjaan    String?
+  jumlah_pohon Int?
+  timestamp    DateTime? @default(now()) @db.Timestamptz(6)
+  motivasi     String?
+  komentar     String?
 
-  @@index([email])
-  @@index([status])
+  @@map("peserta")
+}
+
+model Komentar {
+  id        Int      @id @default(autoincrement())
+  nama      String?
+  whatsapp  String?
+  isi       String
+  suka      Int      @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([nama, whatsapp])
 }

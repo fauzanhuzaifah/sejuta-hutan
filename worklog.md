@@ -151,3 +151,80 @@ Stage Summary:
 
 ---
 
+Task ID: 5
+Agent: Z.ai Code
+Task: Tahap 5 - Tambahkan list peserta dengan scroll dan migrasi data dari CSV
+
+Work Log:
+- Update API endpoint GET /api/peserta:
+  * Menghapus field email dan telepon dari select (untuk privacy)
+  * Menyimpan data sensitif hanya di server side
+- Membuat file peserta.csv dengan 10 data contoh di root project
+- Memperbaiki script import CSV (scripts/import-peserta-csv.ts):
+  * Mengubah findUnique ke findFirst untuk cek duplikasi email
+  * Parse CSV dengan support quoted values
+  * Mapping field yang fleksibel
+- Menjalankan migrasi database:
+  * Push schema Prisma ke PostgreSQL Neon
+  * Import 10 data dari peserta.csv berhasil
+- Update frontend (src/app/page.tsx):
+  * Menambahkan interface Peserta
+  * Menambahkan state: pesertaList, isLoadingPeserta, pesertaError
+  * Implementasi fetchPeserta() untuk mengambil data dari API
+  * useEffect untuk fetch data saat mount dan refresh setelah submit berhasil
+  * Menambahkan section "Daftar Peserta" di bawah form pendaftaran
+  * Komponen card peserta dengan:
+    - Icon pohon hijau
+    - Nama peserta
+    - Jumlah pohon (badge)
+    - Alamat dengan emoji lokasi
+    - Pesan (jika ada)
+    - Tanggal pendaftaran
+    - Status badge (Menunggu/Terkonfirmasi/Selesai)
+  * Loading state dengan spinner
+  * Error state dengan tombol retry
+  * Empty state saat belum ada peserta
+  * Scrollable container dengan max-h-96
+- Update CSS (src/app/globals.css):
+  * Menambahkan custom scrollbar styling
+  * Warna scrollbar hijau sesuai tema
+  - Hover effect pada scrollbar thumb
+
+Stage Summary:
+- List peserta berhasil ditambahkan di bawah form pendaftaran
+- Data diambil dari API tanpa menampilkan email dan telepon (privacy)
+- Scrollable container dengan custom scrollbar hijau
+- 10 data contoh berhasil diimport dari peserta.csv
+- Auto-refresh list setelah peserta baru mendaftar
+- Loading, error, dan empty states ditangani dengan baik
+
+---
+
+Task ID: 6
+Agent: Z.ai Code
+Task: Tahap 6 - Perbaiki format tanggal dan susunan tampilan list peserta
+
+Work Log:
+- Mengubah format tanggal dari toLocaleDateString ke toLocaleString:
+  * Sekarang menampilkan tanggal DAN jam dengan benar
+  * Format Indonesia: "25 Januari 2025, 10.30"
+- Restructure card peserta dengan urutan yang jelas:
+  1. Nama - ditampilkan paling atas dengan font lebih besar
+  2. Alamat - dengan emoji 📍 dan label "Alamat:"
+  3. Jumlah Pohon - dengan emoji 🌳, label "Jumlah Pohon:", dan badge hijau
+  4. Motivasi - dengan emoji 💬, label "Motivasi:", background abu-abu muda
+  5. Tanggal Daftar - dengan emoji 📅, label "Tanggal Daftar:", dan format lengkap
+- Menghapus truncate pada nama dan alamat agar data terlihat penuh
+- Menambahkan spacing antar field dengan space-y-2
+- Membuat motivasi lebih menonjol dengan background dan padding
+- Semua update berhasil di-compile dan API berhasil mengambil data
+
+Stage Summary:
+- Format tanggal pendaftaran sekarang benar dan sesuai dengan database
+- Tampilan list peserta lebih rapi dengan urutan field yang jelas
+- Semua field yang diminta ditampilkan: Nama, Alamat, Jumlah Pohon, Motivasi, Tanggal Daftar
+- Tampilan lebih informatif dengan label dan emoji untuk setiap field
+- Data yang ditampilkan tidak terpotong (tidak ada truncate)
+
+---
+

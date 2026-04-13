@@ -4,14 +4,18 @@ import { db } from '@/lib/db';
 /**
  * API Endpoint untuk Pendaftaran Peserta Program Menanam Sejuta Pohon
  *
+ * Updated schema includes: usia, pekerjaan fields
+ *
  * Method: POST
  * Body:
  * - nama: string (required)
  * - email: string (required)
- * - telepon: string (required)
+ * - whatsapp: string (optional)
  * - alamat: string (required)
+ * - usia: number (optional)
+ * - pekerjaan: string (optional)
  * - jumlah_pohon: number (optional, default: 1)
- * - pesan: string (optional)
+ * - motivasi: string (optional)
  *
  * Response:
  * - success: boolean
@@ -22,10 +26,12 @@ import { db } from '@/lib/db';
 interface PesertaRequest {
   nama: string;
   email: string;
-  telepon: string;
+  whatsapp?: string;
   alamat: string;
+  usia?: number;
+  pekerjaan?: string;
   jumlah_pohon?: number;
-  pesan?: string;
+  motivasi?: string;
 }
 
 // Validasi email format
@@ -48,11 +54,11 @@ export async function POST(request: NextRequest) {
     const body: PesertaRequest = await request.json();
 
     // Validasi field required
-    if (!body.nama || !body.email || !body.telepon || !body.alamat) {
+    if (!body.nama || !body.email || !body.alamat) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Semua field wajib (nama, email, telepon, alamat) harus diisi',
+          message: 'Field wajib (nama, email, alamat) harus diisi',
         },
         { status: 400 }
       );
@@ -69,12 +75,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validasi format telepon
-    if (!isValidPhone(body.telepon)) {
+    // Validasi format whatsapp (jika diisi)
+    if (body.whatsapp && !isValidPhone(body.whatsapp)) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Format nomor telepon tidak valid. Gunakan format: 08xxxxxxxxxx',
+          message: 'Format nomor WhatsApp tidak valid. Gunakan format: 08xxxxxxxxxx',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validasi usia
+    const usia = body.usia ? parseInt(body.usia.toString(), 10) : null;
+    if (usia !== null && (isNaN(usia) || usia < 10 || usia > 100)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Usia harus antara 10 dan 100 tahun',
         },
         { status: 400 }
       );
@@ -93,7 +111,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Cek apakah email sudah terdaftar
-    const existingPeserta = await db.peserta.findUnique({
+    const existingPeserta = await db.peserta.findFirst({
       where: { email: body.email.toLowerCase() },
     });
 
@@ -112,11 +130,12 @@ export async function POST(request: NextRequest) {
       data: {
         nama: body.nama.trim(),
         email: body.email.toLowerCase().trim(),
-        telepon: body.telepon.trim(),
+        whatsapp: body.whatsapp?.trim() || null,
         alamat: body.alamat.trim(),
-        jumlahPohon: jumlahPohon,
-        pesan: body.pesan?.trim() || null,
-        status: 'pending', // Status default adalah pending
+        usia: usia,
+        pekerjaan: body.pekerjaan?.trim() || null,
+        jumlah_pohon: jumlahPohon,
+        motivasi: body.motivasi?.trim() || null,
       },
     });
 
@@ -129,9 +148,8 @@ export async function POST(request: NextRequest) {
           id: peserta.id,
           nama: peserta.nama,
           email: peserta.email,
-          jumlahPohon: peserta.jumlahPohon,
-          status: peserta.status,
-          createdAt: peserta.createdAt,
+          jumlah_pohon: peserta.jumlah_pohon,
+          timestamp: peserta.timestamp,
         },
       },
       { status: 201 }
@@ -194,32 +212,46 @@ export async function GET(request: NextRequest) {
     }
 
     // Build where clause
-    const where: any = {};
-    if (status && ['pending', 'confirmed', 'completed'].includes(status)) {
-      where.status = status;
-    }
+    const where: any = {}; // status tidak ada di database snake_case
+    // if (status && ['pending', 'confirmed', 'completed'].includes(status)) {
+    //   where.status = status;
+    // }
 
-    // Fetch peserta dengan pagination
-    const [peserta, total] = await Promise.all([
-      db.peserta.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-        skip: offset,
-        select: {
-          id: true,
-          nama: true,
-          email: true,
-          telepon: true,
-          alamat: true,
-          jumlahPohon: true,
-          pesan: true,
-          status: true,
-          createdAt: true,
-        },
-      }),
-      db.peserta.count({ where }),
+    // Fetch peserta dengan pagination menggunakan raw query
+    const [pesertaRaw, totalResult, totalTreesResult] = await Promise.all([
+      db.$queryRaw`
+        SELECT
+          id,
+          nama,
+          alamat,
+          usia,
+          pekerjaan,
+          jumlah_pohon,
+          motivasi,
+          timestamp::text
+        FROM "peserta"
+        ORDER BY "timestamp" DESC
+        LIMIT ${limit}
+        OFFSET ${offset}
+      `,
+      db.$queryRaw`SELECT COUNT(*) as count FROM "peserta"`,
+      db.$queryRaw`SELECT COALESCE(SUM("jumlah_pohon"), 0) as total FROM "peserta"`
     ]);
+
+    // Convert timestamp strings to ISO format
+    const peserta = pesertaRaw.map((p: any) => ({
+      id: p.id,
+      nama: p.nama,
+      alamat: p.alamat,
+      usia: p.usia,
+      pekerjaan: p.pekerjaan,
+      jumlah_pohon: p.jumlah_pohon,
+      motivasi: p.motivasi,
+      timestamp: p.timestamp
+    }));
+
+    const total = parseInt((totalResult as any)[0]?.count || '0', 10);
+    const totalTrees = parseInt((totalTreesResult as any)[0]?.total || '0', 10);
 
     return NextResponse.json(
       {
@@ -232,6 +264,7 @@ export async function GET(request: NextRequest) {
           offset,
           hasMore: offset + limit < total,
         },
+        totalTrees,
       },
       { status: 200 }
     );
