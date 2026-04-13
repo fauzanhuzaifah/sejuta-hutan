@@ -1,4 +1,19 @@
-* - pekerjaan: string (optional)
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+
+/**
+ * API Endpoint untuk Pendaftaran Peserta Program Menanam Sejuta Pohon
+ *
+ * Updated schema includes: usia, pekerjaan fields
+ *
+ * Method: POST
+ * Body:
+ * - nama: string (required)
+ * - email: string (required)
+ * - whatsapp: string (optional)
+ * - alamat: string (required)
+ * - usia: number (optional)
+ * - pekerjaan: string (optional)
  * - jumlah_pohon: number (optional, default: 1)
  * - motivasi: string (optional)
  *

@@ -14,6 +14,7 @@ interface FormData {
   jumlah_pohon: string;
   motivasi: string;
 }
+type FormErrorField = keyof FormData | 'general';
 
 interface Peserta {
   id: number;
@@ -302,7 +303,7 @@ export default function LandingPage() {
     jumlah_pohon: '1',
     motivasi: ''
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<FormErrorField, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [successMessage, setSuccessMessage] = useState('');
@@ -517,7 +518,7 @@ export default function LandingPage() {
 
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
+    const newErrors: Partial<Record<FormErrorField, string>> = {};
 
     if (!formData.nama.trim()) {
       newErrors.nama = t.formErrors.requiredName;
