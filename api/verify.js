@@ -28,15 +28,11 @@ export default async function handler(req, res) {
             return;
         }
 
-        // Normalize WhatsApp number
-        const normalizedWa = whatsapp.replace(/[\s\+\-]/g, '');
-        
         const result = await turso.execute({
             sql: `SELECT id, nama, whatsapp FROM peserta 
-                  WHERE LOWER(TRIM(nama)) = LOWER(TRIM(?)) 
-                  AND REPLACE(REPLACE(REPLACE(whatsapp, ' ', ''), '+', ''), '-', '') = ?
+                  WHERE nama = ? AND whatsapp = ?
                   LIMIT 1`,
-            args: [nama, normalizedWa]
+            args: [nama.trim(), whatsapp.trim()]
         });
         
         if (result.rows.length > 0) {

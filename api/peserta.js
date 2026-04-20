@@ -23,14 +23,13 @@ export default async function handler(req, res) {
         else if (req.method === 'POST') {
             const { nama, whatsapp, email, usia, pekerjaan, alamat, jumlah_pohon, motivasi } = req.body;
             
-            const result = await turso.execute({
+            await turso.execute({
                 sql: `INSERT INTO peserta (nama, whatsapp, email, usia, pekerjaan, alamat, jumlah_pohon, motivasi, created_at) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-                      RETURNING *`,
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
                 args: [nama, whatsapp, email || null, usia || null, pekerjaan, alamat, jumlah_pohon || 1, motivasi]
             });
             
-            res.status(201).json({ success: true, data: result.rows[0] });
+            res.status(201).json({ success: true, message: 'Data saved' });
         }
         else if (req.method === 'DELETE') {
             await turso.execute('DELETE FROM peserta');

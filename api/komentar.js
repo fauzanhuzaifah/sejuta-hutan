@@ -22,8 +22,8 @@ export default async function handler(req, res) {
             const result = await turso.execute(`
                 SELECT k.*, p.id as peserta_id 
                 FROM komentar k
-                LEFT JOIN peserta p ON k.whatsapp = p.whatsapp AND LOWER(k.nama) = LOWER(p.nama)
-                WHERE k.is_deleted = 0
+                LEFT JOIN peserta p ON k.whatsapp = p.whatsapp
+                WHERE k.is_deleted = false
                 ORDER BY k.created_at ASC
             `);
             res.status(200).json(result.rows);
@@ -31,25 +31,24 @@ export default async function handler(req, res) {
         else if (req.method === 'POST') {
             const { nama, whatsapp, isi, parent_id } = req.body;
             
-            const result = await turso.execute({
+            await turso.execute({
                 sql: `INSERT INTO komentar (nama, whatsapp, isi, parent_id, suka, created_at, is_deleted) 
-                      VALUES (?, ?, ?, ?, 0, datetime('now'), 0)
-                      RETURNING *`,
+                      VALUES (?, ?, ?, ?, 0, datetime('now'), 0)`,
                 args: [nama, whatsapp, isi, parent_id || null]
             });
             
-            res.status(201).json({ success: true, data: result.rows[0] });
+            res.status(201).json({ success: true, message: 'Comment added' });
         }
         else if (req.method === 'PATCH' && id) {
             // Toggle like
             const { action } = req.body;
             
             if (action === 'like') {
-                const result = await turso.execute({
-                    sql: `UPDATE komentar SET suka = suka + 1 WHERE id = ? RETURNING *`,
+                await turso.execute({
+                    sql: `UPDATE komentar SET suka = suka + 1 WHERE id = ?`,
                     args: [id]
                 });
-                res.status(200).json({ success: true, data: result.rows[0] });
+                res.status(200).json({ success: true, message: 'Liked' });
             } else {
                 res.status(400).json({ error: 'Invalid action' });
             }
