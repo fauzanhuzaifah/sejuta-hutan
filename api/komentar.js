@@ -64,10 +64,25 @@ export default async function handler(request) {
             const body = await request.json();
             const { nama, whatsapp, isi, parent_id, peserta_id } = body;
             
+            // Validate: Check if commenter is a registered participant
+            const participants = await tursoQuery(
+                'SELECT id, nama, whatsapp FROM peserta WHERE nama = ? AND whatsapp = ?',
+                [nama, whatsapp]
+            );
+            
+            if (!participants || participants.length === 0) {
+                return new Response(JSON.stringify({ 
+                    error: 'Hanya peserta yang sudah mendaftar yang dapat memberikan komentar',
+                    requiresRegistration: true 
+                }), { status: 403, headers });
+            }
+            
+            const participant = participants[0];
+            
             await tursoQuery(
                 `INSERT INTO komentar (nama, whatsapp, isi, parent_id, peserta_id, suka, created_at) 
                  VALUES (?, ?, ?, ?, ?, 0, datetime('now'))`,
-                [nama, whatsapp, isi, parent_id || null, peserta_id || null]
+                [nama, whatsapp, isi, parent_id || null, participant.id]
             );
             
             return new Response(JSON.stringify({ success: true, message: 'Komentar berhasil dikirim' }), { status: 200, headers });
