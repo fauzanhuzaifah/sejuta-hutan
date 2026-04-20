@@ -414,7 +414,7 @@
                 </div>
             </div>
             
-            <button onclick="App.Auth.showLogin()" id="admin-nav-btn" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-forest-600 hover:text-forest-400 hover:bg-forest-900/50 transition-all light-mode:text-green-700 light-mode:hover:bg-green-50"><i data-lucide="shield" class="w-4 h-4"></i><span class="hidden lg:inline" data-i18n="nav_admin">Admin</span></button>
+            <a href="/admin" id="admin-nav-btn" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-forest-600 hover:text-forest-400 hover:bg-forest-900/50 transition-all light-mode:text-green-700 light-mode:hover:bg-green-50"><i data-lucide="shield" class="w-4 h-4"></i><span class="hidden lg:inline" data-i18n="nav_admin">Admin</span></a>
         </div>
         
         <button id="mobile-menu-btn" class="md:hidden text-forest-300 light-mode:text-forest-700" onclick="App.UI.toggleMobileMenu()"><i data-lucide="menu" class="w-6 h-6"></i></button>
@@ -431,7 +431,7 @@
                 <button onclick="App.I18n.set('id');App.UI.toggleMobileMenu();" class="flex-1 text-xs py-2 rounded-lg bg-forest-800/50 light-mode:bg-green-100 light-mode:text-green-800">🇮🇩 ID</button>
                 <button onclick="App.I18n.set('en');App.UI.toggleMobileMenu();" class="flex-1 text-xs py-2 rounded-lg bg-forest-800/50 light-mode:bg-green-100 light-mode:text-green-800">🇬🇧 EN</button>
             </div>
-            <button onclick="App.Auth.showLogin();App.UI.toggleMobileMenu();" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-forest-600 hover:text-forest-400 hover:bg-forest-900/50 transition-all light-mode:text-green-700 light-mode:hover:bg-green-50"><i data-lucide="shield" class="w-4 h-4"></i> <span data-i18n="nav_admin">Panel Admin</span></button>
+            <a href="/admin" onclick="App.UI.toggleMobileMenu()" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-forest-600 hover:text-forest-400 hover:bg-forest-900/50 transition-all light-mode:text-green-700 light-mode:hover:bg-green-50"><i data-lucide="shield" class="w-4 h-4"></i> <span data-i18n="nav_admin">Panel Admin</span></a>
         </div>
     </div>
 </nav>
