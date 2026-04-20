@@ -1399,7 +1399,7 @@ const App = {
         async sync() {
             try {
                 console.log('Starting data sync...');
-                const remote = await this.api('peserta');
+                let remote = await this.api('peserta');
                 console.log('API successful, data received:', remote);
                 
                 // Handle different response formats
