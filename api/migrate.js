@@ -1,31 +1,36 @@
-const { createClient } = require('@libsql/client');
+export const config = { runtime: 'edge' };
+
+import { createClient } from '@libsql/client/web';
 
 const turso = createClient({
     url: process.env.TURSO_URL,
     authToken: process.env.TURSO_TOKEN
 });
 
-module.exports = async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export default async function handler(request) {
+    const method = request.method;
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    };
 
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+    if (method === 'OPTIONS') {
+        return new Response(null, { 
+            status: 200, 
+            headers: { ...headers, 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' }
+        });
     }
 
-    if (req.method !== 'POST') {
-        res.status(405).json({ error: 'Method not allowed' });
-        return;
+    if (method !== 'POST') {
+        return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers });
     }
 
     try {
-        const { data } = req.body;
+        const body = await request.json();
+        const { data } = body;
         
         if (!Array.isArray(data) || data.length === 0) {
-            res.status(400).json({ error: 'No data provided' });
-            return;
+            return new Response(JSON.stringify({ error: 'No data provided' }), { status: 400, headers });
         }
 
         let inserted = 0;
@@ -35,7 +40,7 @@ module.exports = async function handler(req, res) {
             try {
                 await turso.execute({
                     sql: `INSERT INTO peserta (nama, whatsapp, email, usia, pekerjaan, alamat, jumlah_pohon, motivasi, created_at) 
-                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
                     args: [
                         item.nama,
                         item.whatsapp,
@@ -44,8 +49,7 @@ module.exports = async function handler(req, res) {
                         item.pekerjaan,
                         item.alamat,
                         item.jumlah_pohon || item.jumlah || 1,
-                        item.motivasi,
-                        item.created_at || new Date().toISOString()
+                        item.motivasi
                     ]
                 });
                 inserted++;
@@ -54,13 +58,13 @@ module.exports = async function handler(req, res) {
             }
         }
 
-        res.status(200).json({ 
+        return new Response(JSON.stringify({ 
             success: true, 
             message: `Migrated ${inserted} records`,
             total: data.length 
-        });
+        }), { headers });
     } catch (error) {
         console.error('Migration error:', error);
-        res.status(500).json({ error: error.message });
+        return new Response(JSON.stringify({ error: error.message }), { status: 500, headers });
     }
 }

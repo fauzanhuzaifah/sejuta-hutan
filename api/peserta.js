@@ -1,27 +1,42 @@
-const { createClient } = require('@libsql/client');
+export const config = {
+    runtime: 'edge'
+};
 
-const turso = createClient({
-    url: process.env.TURSO_URL,
-    authToken: process.env.TURSO_TOKEN
-});
+import { createClient } from '@libsql/client/web';
 
-module.exports = async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export default async function handler(request) {
+    const url = new URL(request.url);
+    const method = request.method;
+    
+    const turso = createClient({
+        url: process.env.TURSO_URL,
+        authToken: process.env.TURSO_TOKEN
+    });
 
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    };
+
+    if (method === 'OPTIONS') {
+        return new Response(null, { 
+            status: 200, 
+            headers: {
+                ...headers,
+                'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            }
+        });
     }
 
     try {
-        if (req.method === 'GET') {
+        if (method === 'GET') {
             const result = await turso.execute('SELECT * FROM peserta ORDER BY id DESC');
-            res.status(200).json(result.rows);
+            return new Response(JSON.stringify(result.rows), { headers });
         }
-        else if (req.method === 'POST') {
-            const { nama, whatsapp, email, usia, pekerjaan, alamat, jumlah_pohon, motivasi } = req.body;
+        else if (method === 'POST') {
+            const body = await request.json();
+            const { nama, whatsapp, email, usia, pekerjaan, alamat, jumlah_pohon, motivasi } = body;
             
             await turso.execute({
                 sql: `INSERT INTO peserta (nama, whatsapp, email, usia, pekerjaan, alamat, jumlah_pohon, motivasi, created_at) 
@@ -29,17 +44,26 @@ module.exports = async function handler(req, res) {
                 args: [nama, whatsapp, email || null, usia || null, pekerjaan, alamat, jumlah_pohon || 1, motivasi]
             });
             
-            res.status(201).json({ success: true, message: 'Data saved' });
+            return new Response(JSON.stringify({ success: true, message: 'Data saved' }), { 
+                status: 201, 
+                headers 
+            });
         }
-        else if (req.method === 'DELETE') {
+        else if (method === 'DELETE') {
             await turso.execute('DELETE FROM peserta');
-            res.status(200).json({ success: true, message: 'All data cleared' });
+            return new Response(JSON.stringify({ success: true, message: 'All data cleared' }), { headers });
         }
         else {
-            res.status(405).json({ error: 'Method not allowed' });
+            return new Response(JSON.stringify({ error: 'Method not allowed' }), { 
+                status: 405, 
+                headers 
+            });
         }
     } catch (error) {
         console.error('API Error:', error);
-        res.status(500).json({ error: error.message });
+        return new Response(JSON.stringify({ error: error.message }), { 
+            status: 500, 
+            headers 
+        });
     }
 }

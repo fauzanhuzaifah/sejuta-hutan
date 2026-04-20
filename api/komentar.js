@@ -1,24 +1,31 @@
-const { createClient } = require('@libsql/client');
+export const config = { runtime: 'edge' };
 
-const turso = createClient({
-    url: process.env.TURSO_URL,
-    authToken: process.env.TURSO_TOKEN
-});
+import { createClient } from '@libsql/client/web';
 
-module.exports = async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export default async function handler(request) {
+    const url = new URL(request.url);
+    const method = request.method;
+    const id = url.searchParams.get('id');
+    
+    const turso = createClient({
+        url: process.env.TURSO_URL,
+        authToken: process.env.TURSO_TOKEN
+    });
 
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    };
+
+    if (method === 'OPTIONS') {
+        return new Response(null, { 
+            status: 200, 
+            headers: { ...headers, 'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' }
+        });
     }
 
     try {
-        const { id } = req.query;
-
-        if (req.method === 'GET') {
+        if (method === 'GET') {
             const result = await turso.execute(`
                 SELECT k.*, p.id as peserta_id 
                 FROM komentar k
@@ -26,10 +33,11 @@ module.exports = async function handler(req, res) {
                 WHERE k.is_deleted = false
                 ORDER BY k.created_at ASC
             `);
-            res.status(200).json(result.rows);
+            return new Response(JSON.stringify(result.rows), { headers });
         }
-        else if (req.method === 'POST') {
-            const { nama, whatsapp, isi, parent_id } = req.body;
+        else if (method === 'POST') {
+            const body = await request.json();
+            const { nama, whatsapp, isi, parent_id } = body;
             
             await turso.execute({
                 sql: `INSERT INTO komentar (nama, whatsapp, isi, parent_id, suka, created_at, is_deleted) 
@@ -37,35 +45,34 @@ module.exports = async function handler(req, res) {
                 args: [nama, whatsapp, isi, parent_id || null]
             });
             
-            res.status(201).json({ success: true, message: 'Comment added' });
+            return new Response(JSON.stringify({ success: true, message: 'Comment added' }), { status: 201, headers });
         }
-        else if (req.method === 'PATCH' && id) {
-            // Toggle like
-            const { action } = req.body;
+        else if (method === 'PATCH' && id) {
+            const body = await request.json();
+            const { action } = body;
             
             if (action === 'like') {
                 await turso.execute({
                     sql: `UPDATE komentar SET suka = suka + 1 WHERE id = ?`,
-                    args: [id]
+                    args: [parseInt(id)]
                 });
-                res.status(200).json({ success: true, message: 'Liked' });
+                return new Response(JSON.stringify({ success: true, message: 'Liked' }), { headers });
             } else {
-                res.status(400).json({ error: 'Invalid action' });
+                return new Response(JSON.stringify({ error: 'Invalid action' }), { status: 400, headers });
             }
         }
-        else if (req.method === 'DELETE' && id) {
-            // Soft delete
+        else if (method === 'DELETE' && id) {
             await turso.execute({
                 sql: `UPDATE komentar SET is_deleted = 1, isi = '[Komentar telah dihapus]' WHERE id = ?`,
-                args: [id]
+                args: [parseInt(id)]
             });
-            res.status(200).json({ success: true, message: 'Comment deleted' });
+            return new Response(JSON.stringify({ success: true, message: 'Comment deleted' }), { headers });
         }
         else {
-            res.status(405).json({ error: 'Method not allowed' });
+            return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers });
         }
     } catch (error) {
         console.error('API Error:', error);
-        res.status(500).json({ error: error.message });
+        return new Response(JSON.stringify({ error: error.message }), { status: 500, headers });
     }
 }

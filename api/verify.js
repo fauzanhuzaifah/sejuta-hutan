@@ -1,31 +1,37 @@
-const { createClient } = require('@libsql/client');
+export const config = { runtime: 'edge' };
 
-const turso = createClient({
-    url: process.env.TURSO_URL,
-    authToken: process.env.TURSO_TOKEN
-});
+import { createClient } from '@libsql/client/web';
 
-module.exports = async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export default async function handler(request) {
+    const method = request.method;
+    
+    const turso = createClient({
+        url: process.env.TURSO_URL,
+        authToken: process.env.TURSO_TOKEN
+    });
 
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    };
+
+    if (method === 'OPTIONS') {
+        return new Response(null, { 
+            status: 200, 
+            headers: { ...headers, 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' }
+        });
     }
 
-    if (req.method !== 'POST') {
-        res.status(405).json({ error: 'Method not allowed' });
-        return;
+    if (method !== 'POST') {
+        return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers });
     }
 
     try {
-        const { nama, whatsapp } = req.body;
+        const body = await request.json();
+        const { nama, whatsapp } = body;
         
         if (!nama || !whatsapp) {
-            res.status(400).json({ error: 'Nama dan WhatsApp wajib diisi' });
-            return;
+            return new Response(JSON.stringify({ error: 'Nama dan WhatsApp wajib diisi' }), { status: 400, headers });
         }
 
         const result = await turso.execute({
@@ -36,18 +42,15 @@ module.exports = async function handler(req, res) {
         });
         
         if (result.rows.length > 0) {
-            res.status(200).json({ 
-                success: true, 
-                user: result.rows[0] 
-            });
+            return new Response(JSON.stringify({ success: true, user: result.rows[0] }), { headers });
         } else {
-            res.status(404).json({ 
+            return new Response(JSON.stringify({ 
                 success: false, 
                 error: 'Data tidak ditemukan. Pastikan nama dan nomor WhatsApp sudah terdaftar sebagai peserta.' 
-            });
+            }), { status: 404, headers });
         }
     } catch (error) {
         console.error('Verify Error:', error);
-        res.status(500).json({ error: error.message });
+        return new Response(JSON.stringify({ error: error.message }), { status: 500, headers });
     }
 }

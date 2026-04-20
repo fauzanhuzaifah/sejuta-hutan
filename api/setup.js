@@ -1,4 +1,6 @@
-const { createClient } = require('@libsql/client');
+export const config = { runtime: 'edge' };
+
+import { createClient } from '@libsql/client/web';
 
 const turso = createClient({
     url: process.env.TURSO_URL,
@@ -36,8 +38,11 @@ CREATE INDEX IF NOT EXISTS idx_komentar_parent ON komentar(parent_id);
 CREATE INDEX IF NOT EXISTS idx_komentar_deleted ON komentar(is_deleted);
 `;
 
-module.exports = async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+export default async function handler(request) {
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    };
     
     try {
         const statements = schema.split(';').filter(s => s.trim());
@@ -46,9 +51,9 @@ module.exports = async function handler(req, res) {
                 await turso.execute(sql);
             }
         }
-        res.status(200).json({ success: true, message: 'Database setup complete' });
+        return new Response(JSON.stringify({ success: true, message: 'Database setup complete' }), { headers });
     } catch (error) {
         console.error('Setup error:', error);
-        res.status(500).json({ error: error.message });
+        return new Response(JSON.stringify({ error: error.message }), { status: 500, headers });
     }
 }
