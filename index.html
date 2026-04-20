@@ -1360,47 +1360,6 @@ const App = {
         },
         getAll() {
             const data = JSON.parse(localStorage.getItem(App.Config.STORAGE_KEY) || '[]');
-            console.log('getAll() - Retrieved data:', data);
-            
-            // If no data exists, add some dummy data for testing
-            if (data.length === 0) {
-                console.log('No data found, adding dummy data for testing');
-                const dummyData = [
-                    {
-                        id: 1,
-                        nama: "Ahmad Fauzi",
-                        whatsapp: "081234567890",
-                        email: "ahmad.fauzi@email.com",
-                        usia: 28,
-                        pekerjaan: "Guru",
-                        alamat: "Lhokseumawe",
-                        jumlah_pohon: 10,
-                        jumlah: 10,
-                        motivasi: "Untuk masa depan yang lebih hijau",
-                        tanggal: "15 Januari 2024",
-                        timestamp: "2024-01-15T10:30:00Z",
-                        _synced: true
-                    },
-                    {
-                        id: 2,
-                        nama: "Siti Nurhaliza",
-                        whatsapp: "082345678901",
-                        email: "siti.nur@email.com",
-                        usia: 32,
-                        pekerjaan: "Dokter",
-                        alamat: "Banda Aceh",
-                        jumlah_pohon: 15,
-                        jumlah: 15,
-                        motivasi: "Menanam pohon untuk ketahanan lingkungan",
-                        tanggal: "16 Januari 2024",
-                        timestamp: "2024-01-16T14:20:00Z",
-                        _synced: true
-                    }
-                ];
-                this.save(dummyData);
-                return dummyData;
-            }
-            
             return data;
         },
         save(data) {
@@ -1415,7 +1374,7 @@ const App = {
             const data = this.getAll();
             const entry = data[index];
             if (entry && entry.id) {
-                try { await this.api(`peserta-robust/${entry.id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+                try { await this.api(`peserta/${entry.id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
             }
             data.splice(index, 1);
             this.save(data);
@@ -1425,7 +1384,7 @@ const App = {
         },
         async sendToDB(data) {
             try {
-                await this.api('peserta-robust', {
+                await this.api('peserta', {
                     method: 'POST',
                     body: JSON.stringify(data)
                 });
@@ -1438,24 +1397,8 @@ const App = {
         async sync() {
             try {
                 console.log('Starting data sync...');
-                let remote;
-                
-                try {
-                    // Try robust endpoint first
-                    remote = await this.api('peserta-robust');
-                    console.log('Robust API successful, data received:', remote);
-                } catch (mainError) {
-                    console.warn('Robust API failed, trying fallback endpoint:', mainError.message);
-                    
-                    try {
-                        // Try simple fallback endpoint
-                        remote = await this.api('peserta-simple');
-                        console.log('Fallback API successful, data received:', remote);
-                    } catch (fallbackError) {
-                        console.error('Both robust and fallback APIs failed');
-                        throw mainError; // Use original error
-                    }
-                }
+                const remote = await this.api('peserta');
+                console.log('API successful, data received:', remote);
                 
                 // Handle different response formats
                 if (remote && remote.data && Array.isArray(remote.data)) {
