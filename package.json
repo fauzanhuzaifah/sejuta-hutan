@@ -1,0 +1,16 @@
+{
+  "name": "sejuta-pohon",
+  "version": "2.0.0",
+  "description": "Menanam Sejuta Pohon — Kota Lhokseumawe",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.14.0"
+  },
+  "devDependencies": {
+    "vercel": "^41.0.0"
+  }
+}

@@ -1,0 +1,18 @@
+{
+    "version": 2,
+    "functions": {
+        "api/*.js": {
+            "maxDuration": 10
+        }
+    },
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/$1.js"
+        }
+    ],
+    "env": {
+        "TURSO_URL": "@turso-url",
+        "TURSO_TOKEN": "@turso-token"
+    }
+}

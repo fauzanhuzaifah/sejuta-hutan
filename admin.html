@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Sejuta Pohon Lhokseumawe</title>
+    
+    <!-- DEPENDENSI EKSTERNAL -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- KONFIGURASI TAILWIND -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        forest: { 50:'#f0fdf4', 100:'#dcfce7', 200:'#bbf7d0', 300:'#86efac', 400:'#4ade80', 500:'#22c55e', 600:'#16a34a', 700:'#15803d', 800:'#166534', 900:'#14532d', 950:'#052e16' }
+                    },
+                    fontFamily: { inter:['Inter','sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#052e16; color:#e8f5e9; }
+        
+        .light-mode { background:#f0fdf4; color:#14532d; }
+        .light-mode .bg-forest-950 { background:#f0fdf4!important; }
+        .light-mode .bg-forest-900 { background:#ffffff!important; }
+        .light-mode .text-forest-100 { color:#14532d!important; }
+        .light-mode .text-forest-200 { color:#166534!important; }
+        .light-mode .text-forest-300 { color:#15803d!important; }
+        .light-mode .text-forest-400 { color:#4b5563!important; }
+        .light-mode .text-forest-500 { color:#6b7280!important; }
+        .light-mode .border-forest-700\/30 { border-color:#bbf7d0!important; }
+        .light-mode .border-forest-800 { border-color:#dcfce7!important; }
+        
+        .data-table { width:100%; border-collapse:collapse; }
+        .data-table thead tr { background:rgba(22,101,52,0.6); }
+        .data-table th { padding:12px 16px; text-align:left; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#86efac; }
+        .data-table td { padding:12px 16px; border-top:1px solid rgba(34,197,94,0.1); font-size:0.875rem; }
+        .data-table tbody tr:hover { background:rgba(34,197,94,0.08); }
+        
+        .sync-spinner { animation:spin 1s linear infinite; }
+        @keyframes spin { to{transform:rotate(360deg)} }
+        
+        .toast { position:fixed; top:24px; right:24px; z-index:9999; transform:translateX(120%); transition:transform 0.5s cubic-bezier(0.16,1,0.3,1); background:rgba(22,101,52,0.95); border:1px solid rgba(34,197,94,0.3); backdrop-filter:blur(10px); padding:16px 20px; border-radius:12px; max-width:320px; }
+        .toast.show { transform:translateX(0); }
+        .toast.error { background:rgba(185,28,28,0.95); border-color:rgba(239,68,68,0.3); }
+        
+        .password-input { background:rgba(22,101,52,0.3); border:1px solid rgba(34,197,94,0.2); color:#e8f5e9; padding:12px 16px; border-radius:8px; width:100%; font-size:0.875rem; }
+        .password-input:focus { outline:none; border-color:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,0.15); }
+        .password-input.error { border-color:#ef4444; box-shadow:0 0 0 3px rgba(239,68,68,0.15); }
+        
+        .modal-overlay { position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,0.8); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; }
+        .modal-overlay.active { display:flex; }
+        .modal-content { background:#0f2818; border:1px solid rgba(34,197,94,0.2); border-radius:16px; padding:32px; max-width:400px; width:90%; transform:scale(0.95); transition:transform 0.3s ease; }
+        .light-mode .modal-content { background:#ffffff; border-color:#bbf7d0; }
+        .modal-overlay.active .modal-content { transform:scale(1); }
+        
+        .truncate { max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .truncate:hover { overflow:visible; white-space:normal; word-break:break-word; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <h4 id="toast-title" class="font-bold text-sm mb-1 text-white"></h4>
+        <p id="toast-msg" class="text-xs text-forest-200"></p>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay active">
+        <div class="modal-content text-center">
+            <div class="w-16 h-16 rounded-2xl bg-forest-700/30 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="shield" class="w-8 h-8 text-forest-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-forest-100 mb-2 light-mode:text-forest-800">Admin Login</h3>
+            <p class="text-sm text-forest-500 mb-6">Masukkan password untuk mengakses panel admin</p>
+            <input type="password" id="admin-pw" placeholder="Password" class="password-input mb-4">
+            <p id="admin-err" class="text-xs text-red-400 hidden mb-4">Password salah!</p>
+            <button onclick="attemptLogin()" class="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-forest-600 to-forest-700 hover:from-forest-500 hover:to-forest-600 transition-all mb-3">
+                Masuk
+            </button>
+            <a href="index.html" class="text-xs text-forest-500 hover:text-forest-300">Kembali ke Halaman Utama</a>
+        </div>
+    </div>
+
+    <!-- Main Admin Panel (Hidden until login) -->
+    <div id="admin-panel" class="hidden">
+        <!-- Header -->
+        <header class="bg-forest-900 border-b border-forest-800 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-forest-500 to-forest-700 flex items-center justify-center">
+                        <i data-lucide="tree-pine" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-forest-100 text-sm light-mode:text-forest-800">Admin Panel</h1>
+                        <p class="text-[10px] text-forest-500">Sejuta Pohon Lhokseumawe</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleTheme()" class="p-2 rounded-lg bg-forest-800/50 text-forest-300 hover:bg-forest-800 transition-colors">
+                        <i data-lucide="sun" id="theme-icon" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="logout()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition-colors text-sm">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="bg-forest-950 border-b border-forest-800/30 py-6">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-forest-900/50 border border-forest-700/30 rounded-xl p-4">
+                        <p class="text-xs text-forest-500 mb-1">Total Peserta</p>
+                        <p id="stat-total" class="text-2xl font-bold text-forest-200">0</p>
+                    </div>
+                    <div class="bg-forest-900/50 border border-forest-700/30 rounded-xl p-4">
+                        <p class="text-xs text-forest-500 mb-1">Total Pohon</p>
+                        <p id="stat-trees" class="text-2xl font-bold text-forest-200">0</p>
+                    </div>
+                    <div class="bg-forest-900/50 border border-forest-700/30 rounded-xl p-4">
+                        <p class="text-xs text-forest-500 mb-1">Rata-rata Pohon/Peserta</p>
+                        <p id="stat-avg" class="text-2xl font-bold text-forest-200">0</p>
+                    </div>
+                    <div class="bg-forest-900/50 border border-forest-700/30 rounded-xl p-4">
+                        <p class="text-xs text-forest-500 mb-1">Terakhir Sync</p>
+                        <p id="stat-last-sync" class="text-sm font-medium text-forest-300">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Bar -->
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex flex-wrap items-center justify-between gap-4 bg-forest-900/30 border border-forest-800/30 rounded-xl p-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="syncData()" id="btn-sync" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-forest-700 text-forest-100 hover:bg-forest-600 transition-colors text-sm">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        <span>Sync Data</span>
+                    </button>
+                    <button onclick="exportCSV()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-forest-800 text-forest-200 hover:bg-forest-700 transition-colors text-sm">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="confirmClearAll()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition-colors text-sm">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Hapus Semua Data</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="max-w-7xl mx-auto px-6 pb-8">
+            <div class="bg-forest-900/30 border border-forest-800/30 rounded-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="rounded-tl-lg">No</th>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>WhatsApp</th>
+                                <th>Email</th>
+                                <th>Usia</th>
+                                <th>Pekerjaan</th>
+                                <th>Alamat</th>
+                                <th>Jumlah Pohon</th>
+                                <th>Motivasi</th>
+                                <th>Tanggal Daftar</th>
+                                <th class="rounded-tr-lg">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body">
+                            <tr>
+                                <td colspan="12" class="text-center py-12 text-forest-500">
+                                    <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-3 opacity-30"></i>
+                                    <p>Belum ada data. Klik "Sync Data" untuk memuat data.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination Controls -->
+                <div class="flex items-center justify-between mt-4 px-2">
+                    <div class="flex items-center gap-2 text-sm text-forest-400">
+                        <span>Tampilkan:</span>
+                        <select id="rows-per-page" onchange="changeRowsPerPage(this.value)" class="bg-forest-900/50 border border-forest-700/30 rounded-lg px-2 py-1 text-forest-200 text-sm focus:outline-none focus:border-forest-500">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span>baris per halaman</span>
+                    </div>
+                    <div class="flex items-center gap-2" id="pagination-controls">
+                        <!-- Pagination buttons injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal-overlay">
+        <div class="modal-content text-center">
+            <div class="w-16 h-16 rounded-2xl bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="alert-triangle" class="w-8 h-8 text-red-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-forest-100 mb-2 light-mode:text-forest-800">Hapus Data?</h3>
+            <p class="text-sm text-forest-500 mb-6">Anda akan menghapus data peserta <strong id="delete-target-name" class="text-forest-300"></strong>. Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 rounded-lg text-sm border border-forest-600 text-forest-300 hover:bg-forest-800">Batal</button>
+                <button onclick="confirmDelete()" class="px-4 py-2 rounded-lg text-sm bg-red-600 text-white hover:bg-red-500">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear All Confirmation Modal -->
+    <div id="clear-modal" class="modal-overlay">
+        <div class="modal-content text-center">
+            <div class="w-16 h-16 rounded-2xl bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="alert-octagon" class="w-8 h-8 text-red-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-forest-100 mb-2 light-mode:text-forest-800">Hapus SEMUA Data?</h3>
+            <p class="text-sm text-forest-500 mb-6">Anda akan menghapus <strong>SELURUH</strong> data peserta dari database. Tindakan ini <strong>TIDAK DAPAT</strong> dibatalkan atau dikembalikan.</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeClearModal()" class="px-4 py-2 rounded-lg text-sm border border-forest-600 text-forest-300 hover:bg-forest-800">Batal</button>
+                <button onclick="executeClearAll()" class="px-4 py-2 rounded-lg text-sm bg-red-600 text-white hover:bg-red-500">Ya, Hapus Semua</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { neon } from 'https://esm.sh/@neondatabase/serverless';
+
+        // --- CONFIGURATION ---
+        const CONFIG = {
+            DB_URL: 'postgresql://neondb_owner:npg_2eWGNaKP8LZi@ep-crimson-tooth-a1xgngig-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require',
+            ADMIN_PASS: 'sejutapohon2025',
+            SESSION_KEY: 'sp_admin_auth',
+            SESSION_DURATION: 4 * 60 * 60 * 1000 // 4 hours
+        };
+
+        // --- STATE ---
+        let sql = null;
+        let currentData = [];
+        let deleteTargetId = null;
+        let pagination = { currentPage: 1, rowsPerPage: 10, totalPages: 1 };
+
+        // --- DATABASE ---
+        function getSql() {
+            if (!sql) sql = neon(CONFIG.DB_URL);
+            return sql;
+        }
+
+        // --- AUTHENTICATION ---
+        function isLoggedIn() {
+            try {
+                const s = JSON.parse(sessionStorage.getItem(CONFIG.SESSION_KEY));
+                if (s && s.exp > Date.now()) return true;
+                sessionStorage.removeItem(CONFIG.SESSION_KEY);
+                return false;
+            } catch { return false; }
+        }
+
+        function login(pass) {
+            if (pass.toLowerCase() === CONFIG.ADMIN_PASS.toLowerCase()) {
+                sessionStorage.setItem(CONFIG.SESSION_KEY, JSON.stringify({ exp: Date.now() + CONFIG.SESSION_DURATION }));
+                return true;
+            }
+            return false;
+        }
+
+        window.logout = function() {
+            sessionStorage.removeItem(CONFIG.SESSION_KEY);
+            showToast('Logout berhasil', 'Anda telah keluar dari panel admin');
+            setTimeout(() => location.reload(), 1000);
+        };
+
+        window.attemptLogin = function() {
+            const pw = document.getElementById('admin-pw').value;
+            if (login(pw)) {
+                document.getElementById('login-modal').classList.remove('active');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                lucide.createIcons();
+                syncData();
+            } else {
+                document.getElementById('admin-err').classList.remove('hidden');
+                document.getElementById('admin-pw').classList.add('error');
+            }
+        };
+
+        // Check login on load
+        if (isLoggedIn()) {
+            document.getElementById('login-modal').classList.remove('active');
+            document.getElementById('admin-panel').classList.remove('hidden');
+        }
+
+        // --- DATA OPERATIONS ---
+        window.syncData = async function() {
+            const btn = document.getElementById('btn-sync');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 sync-spinner"></i><span>Loading...</span>`;
+            btn.disabled = true;
+            lucide.createIcons();
+
+            try {
+                const result = await getSql()`SELECT * FROM peserta ORDER BY id DESC`;
+                currentData = result || [];
+                renderTable();
+                updateStats();
+                document.getElementById('stat-last-sync').textContent = new Date().toLocaleTimeString('id-ID');
+                showToast('Sync berhasil', `${currentData.length} data dimuat dari database`);
+            } catch (e) {
+                console.error(e);
+                showToast('Sync gagal', 'Tidak dapat terhubung ke database', true);
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        };
+
+        window.exportCSV = function() {
+            if (!currentData.length) {
+                showToast('Export gagal', 'Tidak ada data untuk diexport', true);
+                return;
+            }
+
+            const headers = ['No', 'ID', 'Nama', 'WhatsApp', 'Email', 'Usia', 'Pekerjaan', 'Alamat', 'Jumlah Pohon', 'Motivasi', 'Timestamp'];
+            const rows = currentData.map((d, i) => [
+                i + 1,
+                d.id,
+                `"${(d.nama || '').replace(/"/g, '""')}"`,
+                `"${(d.whatsapp || d.wa || '').replace(/"/g, '""')}"`,
+                `"${(d.email || '').replace(/"/g, '""')}"`,
+                d.usia || '',
+                `"${(d.pekerjaan || '').replace(/"/g, '""')}"`,
+                `"${(d.alamat || '').replace(/"/g, '""')}"`,
+                d.jumlah_pohon || d.jumlah || 0,
+                `"${(d.motivasi || '').replace(/"/g, '""')}"`,
+                d.timestamp || ''
+            ].join(','));
+
+            const csv = '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Data_Peserta_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast('Export berhasil', `${currentData.length} data diekspor ke CSV`);
+        };
+
+        window.confirmClearAll = function() {
+            document.getElementById('clear-modal').classList.add('active');
+        };
+
+        window.closeClearModal = function() {
+            document.getElementById('clear-modal').classList.remove('active');
+        };
+
+        window.executeClearAll = async function() {
+            try {
+                await getSql()`DELETE FROM peserta`;
+                currentData = [];
+                renderTable();
+                updateStats();
+                closeClearModal();
+                showToast('Hapus berhasil', 'Semua data peserta telah dihapus');
+            } catch (e) {
+                console.error(e);
+                showToast('Hapus gagal', 'Tidak dapat menghapus data', true);
+            }
+        };
+
+        window.confirmDeleteRow = function(id, nama) {
+            deleteTargetId = id;
+            document.getElementById('delete-target-name').textContent = nama;
+            document.getElementById('delete-modal').classList.add('active');
+        };
+
+        window.closeDeleteModal = function() {
+            document.getElementById('delete-modal').classList.remove('active');
+            deleteTargetId = null;
+        };
+
+        window.confirmDelete = async function() {
+            if (!deleteTargetId) return;
+            try {
+                await getSql()`DELETE FROM peserta WHERE id = ${deleteTargetId}`;
+                currentData = currentData.filter(d => d.id !== deleteTargetId);
+                renderTable();
+                updateStats();
+                closeDeleteModal();
+                showToast('Hapus berhasil', 'Data peserta telah dihapus');
+            } catch (e) {
+                console.error(e);
+                showToast('Hapus gagal', 'Tidak dapat menghapus data', true);
+            }
+        };
+
+        // --- PAGINATION ---
+        window.changeRowsPerPage = function(value) {
+            pagination.rowsPerPage = parseInt(value);
+            pagination.currentPage = 1;
+            renderTable();
+        };
+        
+        window.changePage = function(page) {
+            pagination.currentPage = page;
+            renderTable();
+        };
+        
+        function updatePaginationControls() {
+            const { currentPage, totalPages } = pagination;
+            const container = document.getElementById('pagination-controls');
+            if (!container) return;
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+                    class="px-3 py-1 rounded-lg bg-forest-800/50 text-forest-300 hover:bg-forest-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `
+                        <button onclick="changePage(${i})" 
+                            class="px-3 py-1 rounded-lg text-sm ${i === currentPage ? 'bg-forest-600 text-white' : 'bg-forest-800/50 text-forest-300 hover:bg-forest-700'}">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += `<span class="text-forest-500 px-1">...</span>`;
+                }
+            }
+            
+            html += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+                    class="px-3 py-1 rounded-lg bg-forest-800/50 text-forest-300 hover:bg-forest-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+            `;
+            
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        // --- RENDERING ---
+        function renderTable() {
+            const tbody = document.getElementById('data-table-body');
+            if (!currentData.length) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="12" class="text-center py-12 text-forest-500">
+                            <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-3 opacity-30"></i>
+                            <p>Belum ada data. Klik "Sync Data" untuk memuat data.</p>
+                        </td>
+                    </tr>`;
+                pagination.totalPages = 1;
+                updatePaginationControls();
+                lucide.createIcons();
+                return;
+            }
+            
+            // Calculate pagination
+            const { currentPage, rowsPerPage } = pagination;
+            pagination.totalPages = Math.ceil(currentData.length / rowsPerPage);
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedData = currentData.slice(start, end);
+            
+            // Adjust current page if out of bounds
+            if (currentPage > pagination.totalPages) {
+                pagination.currentPage = pagination.totalPages;
+                return renderTable();
+            }
+
+            tbody.innerHTML = paginatedData.map((d, i) => `
+                <tr>
+                    <td class="text-forest-500">${start + i + 1}</td>
+                    <td class="text-forest-500 font-mono text-xs">${d.id}</td>
+                    <td class="font-medium text-forest-200 light-mode:text-forest-800">${escapeHtml(d.nama)}</td>
+                    <td class="text-forest-300">${escapeHtml(d.whatsapp || d.wa || '-')}</td>
+                    <td class="text-forest-300">${escapeHtml(d.email || '-')}</td>
+                    <td class="text-forest-400">${d.usia || '-'}</td>
+                    <td class="text-forest-400">${escapeHtml(d.pekerjaan)}</td>
+                    <td class="truncate" title="${escapeHtml(d.alamat)}">${escapeHtml(d.alamat)}</td>
+                    <td><span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-forest-700/30 text-forest-300 text-xs font-semibold">${d.jumlah_pohon || d.jumlah || 0}</span></td>
+                    <td class="truncate max-w-[150px]" title="${escapeHtml(d.motivasi)}">${escapeHtml(d.motivasi || '-')}</td>
+                    <td class="text-forest-500 text-xs">${formatDate(d.timestamp)}</td>
+                    <td>
+                        <div class="flex gap-1">
+                            ${(() => {
+                                let wa = (d.whatsapp || d.wa || '').replace(/[^0-9]/g, '');
+                                if (wa.startsWith('0')) wa = '62' + wa.substring(1);
+                                if (!wa.startsWith('62') && wa.length > 0) wa = '62' + wa;
+                                return wa.length > 0 ? `
+                                <a href="https://wa.me/${wa}?text=Halo%20${encodeURIComponent(d.nama || '')}%2C%20terima%20kasih%20telah%20bergabung%20di%20Sejuta%20Pohon%20Lhokseumawe" 
+                                    target="_blank"
+                                    class="p-2 rounded-lg text-green-400 hover:bg-green-900/30 transition-colors"
+                                    title="Kirim WhatsApp ke ${wa}">
+                                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                </a>` : '';
+                            })()}
+                            <button onclick="confirmDeleteRow(${d.id}, '${escapeHtml(d.nama).replace(/'/g, "\\'")}')" 
+                                class="p-2 rounded-lg text-red-400 hover:bg-red-900/30 transition-colors"
+                                title="Hapus">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            updatePaginationControls();
+            lucide.createIcons();
+        }
+
+        function updateStats() {
+            const total = currentData.length;
+            const totalTrees = currentData.reduce((sum, d) => sum + (parseInt(d.jumlah_pohon || d.jumlah) || 0), 0);
+            const avg = total > 0 ? Math.round(totalTrees / total) : 0;
+
+            document.getElementById('stat-total').textContent = total.toLocaleString('id-ID');
+            document.getElementById('stat-trees').textContent = totalTrees.toLocaleString('id-ID');
+            document.getElementById('stat-avg').textContent = avg.toLocaleString('id-ID');
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return '-';
+            try {
+                const d = new Date(timestamp);
+                return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            } catch { return '-'; }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // --- TOAST ---
+        function showToast(title, msg, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').textContent = title;
+            document.getElementById('toast-msg').textContent = msg;
+            toast.className = isError ? 'toast error show' : 'toast show';
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // --- THEME ---
+        window.toggleTheme = function() {
+            const html = document.documentElement;
+            const isLight = html.classList.toggle('light-mode');
+            localStorage.setItem('admin-theme', isLight ? 'light' : 'dark');
+            document.getElementById('theme-icon').setAttribute('data-lucide', isLight ? 'moon' : 'sun');
+            lucide.createIcons();
+        };
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('admin-theme');
+        if (savedTheme === 'light') {
+            document.documentElement.classList.add('light-mode');
+        }
+
+        // Enter key on password input
+        document.getElementById('admin-pw')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') attemptLogin();
+        });
+
+        // Init icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

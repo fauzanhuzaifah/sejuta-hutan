@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menanam Sejuta Pohon — Kota Lhokseumawe</title>
+    
+    <!-- DEPENDENSI EKSTERNAL -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    
+    <!-- KONFIGURASI TAILWIND -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        forest: { 50:'#f0fdf4', 100:'#dcfce7', 200:'#bbf7d0', 300:'#86efac', 400:'#4ade80', 500:'#22c55e', 600:'#16a34a', 700:'#15803d', 800:'#166534', 900:'#14532d', 950:'#052e16' }
+                    },
+                    fontFamily: { inter:['Inter','sans-serif'], playfair:['Playfair Display','serif'] }
+                }
+            }
+        }
+    </script>
+
+    <!-- CSS GAYA & ANIMASI -->
+    <style>
+        /* --- 1. Variabel & Reset --- */
+        :root {
+            --ctrl-bg: rgba(5, 46, 22, 0.9);
+            --ctrl-border: rgba(34, 197, 94, 0.3);
+            --ctrl-text: #86efac;
+            --ctrl-active: rgba(34, 197, 94, 0.2);
+        }
+        
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        /* --- 2. Layout Dasar (Dark Mode Default) --- */
+        body { font-family:'Inter',sans-serif; background:#052e16; color:#e8f5e9; overflow-x:hidden; }
+        
+        /* --- 3. Komponen UI --- */
+        .hero-bg { background:linear-gradient(160deg,#052e16 0%,#0a3d1f 25%,#14532d 50%,#064e3b 75%,#052e16 100%); position:relative; min-height:100vh; }
+        .hero-bg::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 30% 40%,rgba(34,197,94,0.12) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 70% 60%,rgba(16,185,129,0.08) 0%,transparent 50%); }
+        .hero-bg::after { content:''; position:absolute; bottom:0; left:0; right:0; height:200px; background:linear-gradient(to top,#052e16,transparent); }
+        
+        .stat-card { background:linear-gradient(135deg,rgba(22,101,52,0.5),rgba(5,46,22,0.8)); border:1px solid rgba(34,197,94,0.2); backdrop-filter:blur(10px); transition:all 0.4s ease; }
+        .stat-card:hover { border-color:rgba(34,197,94,0.5); transform:translateY(-4px); }
+        
+        .form-input { background:rgba(22,101,52,0.3); border:1px solid rgba(34,197,94,0.2); color:#e8f5e9; transition:all 0.3s ease; }
+        .form-input:focus { outline:none; border-color:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,0.15); background:rgba(22,101,52,0.5); }
+        .form-input::placeholder { color:rgba(134,239,172,0.3); }
+        
+        .btn-primary { background:linear-gradient(135deg,#16a34a,#15803d); position:relative; overflow:hidden; transition:all 0.3s ease; }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(22,163,74,0.4); }
+        
+        /* --- 4. Navigasi & Glassmorphism --- */
+        /* Tambahkan ini pada .nav-blur di dalam style */
+        .nav-blur {
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .dark .nav-blur {
+            background-color: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* --- 5. Efek Animasi --- */
+        .leaf { position:fixed; top:-60px; z-index:0; pointer-events:none; animation:leafFall linear infinite; opacity:0.4; }
+        @keyframes leafFall { 0%{transform:translateY(-60px) rotate(0deg) translateX(0); opacity:0;} 10%{opacity:0.5;} 90%{opacity:0.3;} 100%{transform:translateY(110vh) rotate(720deg) translateX(80px); opacity:0;} }
+        
+        .reveal, .reveal-left, .reveal-right { opacity:0; transition:all 0.8s cubic-bezier(0.16,1,0.3,1); }
+        .reveal.active, .reveal-left.active, .reveal-right.active { opacity:1; transform:translateX(0) translateY(0); }
+        .reveal { transform:translateY(40px); }
+        .reveal-left { transform:translateX(-60px); }
+        .reveal-right { transform:translateX(60px); }
+        
+        .pulse-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; animation:pulseDot 2s ease-in-out infinite; }
+        @keyframes pulseDot { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)} 50%{box-shadow:0 0 0 8px rgba(34,197,94,0)} }
+        
+        .sync-spinner { animation:spin 1s linear infinite; }
+        @keyframes spin { to{transform:rotate(360deg)} }
+
+        /* --- 6. Komponen Modal, Toast & Floating --- */
+        .toast { position:fixed; top:24px; right:24px; z-index:9999; transform:translateX(120%); transition:transform 0.5s cubic-bezier(0.16,1,0.3,1); }
+        .toast.show { transform:translateX(0); }
+        
+        .modal-overlay { position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
+        .modal-overlay.active { opacity:1; pointer-events:all; }
+        .modal-content { transform:scale(0.9) translateY(20px); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .modal-overlay.active .modal-content { transform:scale(1) translateY(0); }
+        
+        #mobile-controls { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:100; display:flex; align-items:center; gap:0; padding:5px; border-radius:9999px; background:var(--ctrl-bg); backdrop-filter:blur(24px); border:1.5px solid var(--ctrl-border); box-shadow:0 8px 32px rgba(0,0,0,0.3); transition:all 0.4s ease; animation:slideUp 0.6s 1s cubic-bezier(0.16,1,0.3,1) both; }
+        @keyframes slideUp { from{opacity:0; transform:translateX(-50%) translateY(30px);} to{opacity:1; transform:translateX(-50%) translateY(0);} }
+
+        /* --- 7. Data Table Styles --- */
+        .data-table thead tr { background:rgba(22,101,52,0.4); }
+        .data-table tbody tr { border-top-color:rgba(34,197,94,0.1); }
+        .data-table tbody tr:hover { background:rgba(34,197,94,0.05); }
+        .delete-row-btn { opacity:0; transition:opacity 0.2s ease; }
+        .data-table tbody tr:hover .delete-row-btn { opacity:1; }
+        
+        /* --- 8. Light Mode Overrides --- */
+        .light-mode { background:#f0fdf4; color:#14532d; --ctrl-bg:rgba(255,255,255,0.9); --ctrl-border:rgba(34,197,94,0.3); --ctrl-text:#15803d; }
+        .light-mode body { background:#f0fdf4!important; color:#14532d!important; }
+        .light-mode .hero-bg { background:linear-gradient(160deg,#f0fdf4 0%,#dcfce7 25%,#bbf7d0 50%,#a7f3d0 75%,#f0fdf4 100%)!important; }
+        .light-mode .hero-bg::before { background:radial-gradient(ellipse 80% 60% at 30% 40%,rgba(34,197,94,0.08) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 70% 60%,rgba(16,185,129,0.06) 0%,transparent 50%)!important; }
+        .light-mode .hero-bg::after { background:linear-gradient(to top,#f0fdf4,transparent)!important; }
+        .light-mode .text-forest-100, .light-mode .text-forest-200, .light-mode .hero-title { color:#14532d!important; }
+        .light-mode .text-forest-300 { color:#54745f!important; }
+        .light-mode .text-forest-400 { color:#166534!important; }
+        .light-mode .text-forest-500 { color:#4b5563!important; }
+        .light-mode .text-forest-600 { color:#6b7280!important; }
+        .light-mode .form-input { background:rgba(255,255,255,0.8); border-color:#bbf7d0; color:#14532d; }
+        .light-mode .data-table tbody tr { background:#ffffff!important; border-color:#dcfce7; }
+        .light-mode .modal-content { background:#ffffff; border-color:#bbf7d0; color:#14532d; }
+        .light-mode .nav-blur { background:rgba(240,253,244,0.9); border-color:#bbf7d0; }
+        .light-mode .nav-scrolled { background:rgba(240,253,244,0.98)!important; }
+        
+        /* Helper Utilities */
+        .section-divider { height:1px; background:linear-gradient(90deg,transparent,rgba(34,197,94,0.3),transparent); }
+        .glow-green { text-shadow:0 0 40px rgba(34,197,94,0.5),0 0 80px rgba(34,197,94,0.2); }
+        .password-input.error { border-color:#ef4444; box-shadow:0 0 0 3px rgba(239,68,68,0.15); }
+        /* Tambahkan ini agar garis terlihat di Light Mode */
+        .light-mode .section-divider {
+            background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.2), transparent);
+        }
+        
+        /* Mobile Adjustments */
+        @media(max-width:768px){
+            .hero-title { font-size:2.5rem!important; }
+            .delete-row-btn { opacity:0.7; }
+            .stat-card .text-3xl, .stat-card .text-4xl { font-size:1.35rem!important; line-height:1.2; }
+            .stat-card { padding:0.875rem!important; }
+        }
+
+        .locked-btn {
+            position: relative;
+            cursor: not-allowed !important; /* Kursor jadi tanda larangan */
+            opacity: 0.5;
+            pointer-events: none; /* Memblokir segala interaksi klik */
+        }
+
+      /* --- ANIMASI KONEKTOR FLOWCHART (OPTIMAL UNTUK MOBILE) --- */
+.flow-connector {
+    position: absolute;
+    z-index: 10;
+    background: rgba(34, 197, 94, 0.3); 
+    border-radius: 4px;
+}
+
+/* KEPALA PANAH (Common Style) */
+.flow-connector::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    /* Animasi */
+    animation: pulseArrow 1.5s ease-in-out infinite;
+}
+
+/* --- VERSI HORIZONTAL (Desktop) --- */
+.flow-connector.horizontal {
+    height: 4px;
+    width: 36px;
+    top: 50%;
+    right: -36px; 
+    transform: translateY(-50%);
+}
+
+.flow-connector.horizontal::after {
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid #4ade80; 
+    /* Gunakan 0 agar tetap di dalam batas visual, 
+       atau gunakan margin-right untuk 'mengeluarkan' sedikit tanpa terpotong */
+    right: 0; 
+    top: 50%;
+    transform: translate(100%, -50%); /* Dorong keluar badan garis sepenuhnya */
+}
+
+/* --- VERSI VERTIKAL (Mobile) --- */
+.flow-connector.vertical {
+    width: 4px;
+    height: 36px;
+    bottom: -36px; 
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.flow-connector.vertical::after {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 10px solid #4ade80; /* Panah menghadap bawah */
+    bottom: 0;
+    left: 50%;
+    /* Gunakan translate(X, Y) untuk memposisikan tepat di ujung bawah badan garis */
+    transform: translate(-50%, 100%);
+    animation-name: pulseArrowVertical;
+}
+
+/* --- ANIMASI REVISI --- */
+/* Penting: Pastikan transform awal (posisi) tetap ada dalam keyframes */
+@keyframes pulseArrow {
+    0%, 100% { opacity: 1; transform: translate(100%, -50%) scale(1); }
+    50% { opacity: 0.5; transform: translate(100%, -50%) scale(0.8); }
+}
+
+@keyframes pulseArrowVertical {
+    0%, 100% { opacity: 1; transform: translate(-50%, 100%) scale(1); }
+    50% { opacity: 0.5; transform: translate(-50%, 100%) scale(0.8); }
+}
+
+/* Light Mode Adjustment */
+.light-mode .flow-connector {
+    background: rgba(22, 163, 74, 0.3);
+}
+.light-mode .flow-connector::after {
+    border-left-color: #16a34a;
+}
+.light-mode .flow-connector.vertical::after {
+    border-top-color: #16a34a;
+    border-left-color: transparent; /* Pastikan reset border agar tidak berantakan */
+}
+
+        /* --- KOMENTAR STYLES --- */
+        .comment-section { max-width: 800px; margin: 0 auto; }
+        .comment-form { background: rgba(22, 101, 52, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 16px; padding: 24px; }
+        .light-mode .comment-form { background: #f0fdf4; border-color: #bbf7d0; }
+        
+        .comment-item { 
+            background: rgba(22, 101, 52, 0.08); 
+            border: 1px solid rgba(34, 197, 94, 0.15); 
+            border-radius: 12px; 
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+        .light-mode .comment-item { background: #f8fdf9; border-color: #dcfce7; }
+        .comment-item:hover { border-color: rgba(34, 197, 94, 0.3); }
+        
+        .comment-reply { 
+            margin-left: 40px; 
+            margin-top: 8px;
+            position: relative;
+        }
+        .comment-reply::before {
+            content: '';
+            position: absolute;
+            left: -28px;
+            top: -20px;
+            width: 2px;
+            height: calc(100% + 20px);
+            background: linear-gradient(to bottom, rgba(34, 197, 94, 0.3), transparent);
+            border-radius: 2px;
+        }
+        
+        .comment-avatar { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, #22c55e, #166534);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .comment-actions { display: flex; gap: 16px; margin-top: 12px; }
+        .comment-action-btn { 
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; color: #86efac; 
+            background: none; border: none; cursor: pointer;
+            transition: all 0.2s;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .light-mode .comment-action-btn { color: #16a34a; }
+        .comment-action-btn:hover { background: rgba(34, 197, 94, 0.1); }
+        .comment-action-btn.liked { color: #ef4444; }
+        .comment-action-btn.liked:hover { background: rgba(239, 68, 68, 0.1); }
+        
+        .comment-input { 
+            width: 100%; 
+            background: rgba(22, 101, 52, 0.2); 
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #e8f5e9;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        .light-mode .comment-input { background: #f0fdf4; color: #14532d; border-color: #bbf7d0; }
+        .comment-input:focus { outline: none; border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15); }
+        
+        .verify-form { 
+            background: linear-gradient(135deg, rgba(22, 101, 52, 0.15), rgba(34, 197, 94, 0.05));
+            border: 2px dashed rgba(34, 197, 94, 0.3);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+        }
+        .light-mode .verify-form { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: #86efac; }
+        
+        .verified-badge { 
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .light-mode .verified-badge { background: #dcfce7; color: #166534; }
+        
+        .sort-tabs { 
+            display: flex; gap: 8px; 
+            background: rgba(22, 101, 52, 0.1);
+            padding: 6px;
+            border-radius: 12px;
+            width: fit-content;
+        }
+        .light-mode .sort-tabs { background: #f0fdf4; }
+        .sort-tab { 
+            padding: 8px 16px; 
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #86efac;
+        }
+        .light-mode .sort-tab { color: #4b5563; }
+        .sort-tab:hover { background: rgba(34, 197, 94, 0.1); }
+        .sort-tab.active { 
+            background: #22c55e; 
+            color: white;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<!-- CONTAINER PARTIKEL DAUN -->
+<div id="leaves-container"></div>
+
+<!-- KOMPONEN: TOAST NOTIFIKASI -->
+<div id="toast" class="toast">
+    <div class="flex items-center gap-3 bg-forest-900 border border-forest-600 rounded-xl px-5 py-4 shadow-2xl max-w-sm light-mode:bg-white light-mode:border-green-200">
+        <div class="w-10 h-10 rounded-full bg-forest-600/30 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="check-circle" class="w-5 h-5 text-forest-400" id="toast-icon"></i>
+        </div>
+        <div class="min-w-0">
+            <p class="font-semibold text-forest-200 text-sm light-mode:text-forest-800" id="toast-title">Berhasil!</p>
+            <p class="text-forest-400 text-xs truncate light-mode:text-forest-600" id="toast-msg">Data berhasil disimpan.</p>
+        </div>
+        <button onclick="App.UI.hideToast()" class="text-forest-500 hover:text-forest-300 ml-2 flex-shrink-0 light-mode:text-forest-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+</div>
+
+<!-- KOMPONEN: MODAL -->
+<div id="modal-overlay" class="modal-overlay" onclick="App.UI.closeModal(event)">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="modal-content bg-forest-950 border border-forest-700 rounded-2xl max-w-lg w-full p-8 relative light-mode:bg-white light-mode:border-green-200" onclick="event.stopPropagation()">
+            <button onclick="App.UI.closeModalDirect()" class="absolute top-4 right-4 text-forest-500 hover:text-forest-300 light-mode:text-forest-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+<!-- KOMPONEN: NAVBAR -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 nav-blur transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="#" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-forest-500 to-forest-700 flex items-center justify-center group-hover:scale-105 transition-transform"><i data-lucide="tree-pine" class="w-5 h-5 text-white"></i></div>
+            <div><span class="font-bold text-forest-100 text-sm tracking-wide light-mode:text-forest-800" data-i18n="brand_name">SEJUTA POHON</span><span class="block text-[10px] text-forest-500 tracking-widest uppercase light-mode:text-forest-500" data-i18n="brand_city">Lhokseumawe</span></div>
+        </a>
+        
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-5">
+            <a href="#tentang" class="text-sm text-forest-400 hover:text-forest-200 transition-colors light-mode:text-forest-600 light-mode:hover:text-forest-800" data-i18n="nav_tentang">Tentang</a>
+            <a href="#dampak" class="text-sm text-forest-400 hover:text-forest-200 transition-colors light-mode:text-forest-600 light-mode:hover:text-forest-800" data-i18n="nav_dampak">Dampak</a>
+            <a href="#manfaat" class="text-sm text-forest-400 hover:text-forest-200 transition-colors light-mode:text-forest-600 light-mode:hover:text-forest-800" data-i18n="nav_manfaat">Manfaat</a>
+            <a href="#form" class="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-white" data-i18n="nav_daftar">Daftar Sekarang</a>
+            
+            <!-- Theme Switcher -->
+            <button onclick="App.UI.toggleTheme()" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-forest-800/50 hover:bg-forest-700/50 transition-colors border border-forest-700/30 light-mode:bg-green-100 light-mode:text-green-800 light-mode:border-green-200" title="Toggle Dark/Light Mode">
+                <i data-lucide="sun" class="w-4 h-4" id="desktop-theme-btn"></i>
+            </button>
+            
+            <!-- Language Switcher -->
+            <div class="relative" id="lang-wrapper">
+                <button id="lang-toggle" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-forest-800/50 hover:bg-forest-700/50 transition-colors border border-forest-700/30 light-mode:bg-green-100 light-mode:text-green-800 light-mode:border-green-200">
+                    <i data-lucide="globe" class="w-4 h-4"></i>
+                    <span id="lang-label">ID</span>
+                    <i data-lucide="chevron-down" class="w-3 h-3 opacity-50"></i>
+                </button>
+                <div id="lang-dropdown" class="lang-dropdown absolute top-full right-0 mt-2 bg-forest-950 border border-forest-700 rounded-xl overflow-hidden min-w-[160px] opacity-0 translate-y-[-10px] pointer-events-none transition-all duration-200 shadow-xl light-mode:bg-white light-mode:border-green-200">
+                    <div class="lang-option active p-3 hover:bg-forest-800 cursor-pointer light-mode:hover:bg-green-50" onclick="App.I18n.set('id')">
+                        <span class="text-base">🇮🇩</span>
+                        <div><span class="font-semibold text-forest-200 light-mode:text-forest-800">Indonesia</span><br><span class="text-[10px] text-forest-500 light-mode:text-forest-500">Bahasa Indonesia</span></div>
+                    </div>
+                    <div class="lang-option p-3 hover:bg-forest-800 cursor-pointer light-mode:hover:bg-green-50" onclick="App.I18n.set('en')">
+                        <span class="text-base">🇬🇧</span>
+                        <div><span class="font-semibold text-forest-200 light-mode:text-forest-800">English</span><br><span class="text-[10px] text-forest-500 light-mode:text-forest-500">English Language</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="App.Auth.showLogin()" id="admin-nav-btn" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-forest-600 hover:text-forest-400 hover:bg-forest-900/50 transition-all light-mode:text-green-700 light-mode:hover:bg-green-50"><i data-lucide="shield" class="w-4 h-4"></i><span class="hidden lg:inline" data-i18n="nav_admin">Admin</span></button>
+        </div>
+        
+        <button id="mobile-menu-btn" class="md:hidden text-forest-300 light-mode:text-forest-700" onclick="App.UI.toggleMobileMenu()"><i data-lucide="menu" class="w-6 h-6"></i></button>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden hidden px-6 pb-4 border-t border-forest-800 light-mode:border-green-200">
+        <div class="flex flex-col gap-3 pt-4">
+            <a href="#tentang" onclick="App.UI.toggleMobileMenu()" class="text-sm text-forest-400 hover:text-forest-200 py-2 light-mode:text-forest-600" data-i18n="nav_tentang">Tentang</a>
+            <a href="#dampak" onclick="App.UI.toggleMobileMenu()" class="text-sm text-forest-400 hover:text-forest-200 py-2 light-mode:text-forest-600" data-i18n="nav_dampak">Dampak</a>
+            <a href="#manfaat" onclick="App.UI.toggleMobileMenu()" class="text-sm text-forest-400 hover:text-forest-200 py-2 light-mode:text-forest-600" data-i18n="nav_manfaat">Manfaat</a>
+            <a href="#form" onclick="App.UI.toggleMobileMenu()" class="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center" data-i18n="nav_daftar">Daftar Sekarang</a>
+            <div class="flex gap-2 mt-2">
+                <button onclick="App.I18n.set('id');App.UI.toggleMobileMenu();" class="flex-1 text-xs py-2 rounded-lg bg-forest-800/50 light-mode:bg-green-100 light-mode:text-green-800">🇮🇩 ID</button>
+                <button onclick="App.I18n.set('en');App.UI.toggleMobileMenu();" class="flex-1 text-xs py-2 rounded-lg bg-forest-800/50 light-mode:bg-green-100 light-mode:text-green-800">🇬🇧 EN</button>
+            </div>
+            <button onclick="App.Auth.showLogin();App.UI.toggleMobileMenu();" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-forest-600 hover:text-forest-400 hover:bg-forest-900/50 transition-all light-mode:text-green-700 light-mode:hover:bg-green-50"><i data-lucide="shield" class="w-4 h-4"></i> <span data-i18n="nav_admin">Panel Admin</span></button>
+        </div>
+    </div>
+</nav>
+
+<!-- BAGIAN: HERO -->
+<section class="hero-bg flex items-center justify-center relative overflow-hidden">
+    <div class="max-w-5xl mx-auto px-6 text-center relative z-10 pt-28 pb-32">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest-800/40 border border-forest-600/20 mb-8 backdrop-blur-sm">
+            <div class="pulse-dot"></div>
+            <span class="text-xs font-semibold text-forest-300 tracking-wider uppercase light-mode:text-green-800" data-i18n="hero_badge">Program Aktif 2026</span>
+        </div>
+        <h1 class="hero-title text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[0.9] mb-6">
+            <span class="block text-forest-100 light-mode:text-forest-900" data-i18n="hero_line1">Menanam</span>
+            <span class="block font-playfair italic text-transparent bg-clip-text bg-gradient-to-r from-forest-400 via-emerald-300 to-forest-400 glow-green" data-i18n="hero_line2">Sejuta Pohon</span>
+            <span class="block text-forest-300 text-3xl md:text-4xl lg:text-5xl font-light mt-2 tracking-wide light-mode:text-forest-700" data-i18n="hero_line3">Kota Lhokseumawe</span>
+        </h1>
+        <p class="text-forest-400 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed light-mode:text-forest-600" data-i18n="hero_desc">Gerakan bersama menyelamatkan bumi dari krisis iklim, satu pohon pada satu waktu. Mari wujudkan Lhokseumawe yang hijau dan berkelanjutan.</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="#form" class="btn-primary px-8 py-4 rounded-2xl font-bold text-white text-base flex items-center gap-2">
+                <i data-lucide="heart-handshake" class="w-5 h-5"></i>
+                <span data-i18n="hero_cta">Daftar Sebagai Relawan</span>
+            </a>
+            <a href="#tentang" class="px-8 py-4 rounded-2xl font-semibold text-forest-300 text-base flex items-center gap-2 border border-forest-600/30 hover:bg-forest-800/30 transition-all light-mode:text-forest-700 light-mode:border-green-300 light-mode:hover:bg-green-50">
+                <i data-lucide="info" class="w-5 h-5"></i>
+                <span data-i18n="hero_cta2">Pelajari Lebih Lanjut</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- BAGIAN: STATS -->
+<section class="relative py-16 bg-forest-950 -mt-1 light-mode:bg-green-50/50">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div class="stat-card rounded-2xl p-6 text-center reveal">
+                <div class="w-12 h-12 rounded-xl bg-forest-700/30 flex items-center justify-center mx-auto mb-3"><i data-lucide="tree-pine" class="w-6 h-6 text-forest-400 light-mode:text-green-600"></i></div>
+                <p class="text-3xl md:text-4xl font-extrabold text-forest-200 count-up light-mode:text-forest-800" data-target="1000000">0</p>
+                <p class="text-xs text-forest-500 mt-1 font-medium light-mode:text-forest-600" data-i18n="stat_trees">Target Pohon</p>
+            </div>
+            <div class="stat-card rounded-2xl p-6 text-center reveal" style="transition-delay:0.1s">
+                <div class="w-12 h-12 rounded-xl bg-forest-700/30 flex items-center justify-center mx-auto mb-3"><i data-lucide="users" class="w-6 h-6 text-forest-400 light-mode:text-green-600"></i></div>
+                <p class="text-3xl md:text-4xl font-extrabold text-forest-200 count-up light-mode:text-forest-800" data-target="10000">0</p>
+                <p class="text-xs text-forest-500 mt-1 font-medium light-mode:text-forest-600" data-i18n="stat_volunteers">Target Relawan</p>
+            </div>
+            <div class="stat-card rounded-2xl p-6 text-center reveal" style="transition-delay:0.2s">
+                <div class="w-12 h-12 rounded-xl bg-forest-700/30 flex items-center justify-center mx-auto mb-3"><i data-lucide="map" class="w-6 h-6 text-forest-400 light-mode:text-green-600"></i></div>
+                <p class="text-3xl md:text-4xl font-extrabold text-forest-200 count-up light-mode:text-forest-800" data-target="9">0</p>
+                <p class="text-xs text-forest-500 mt-1 font-medium light-mode:text-forest-600" data-i18n="stat_kecamatan">Kecamatan</p>
+            </div>
+            <div class="stat-card rounded-2xl p-6 text-center reveal" style="transition-delay:0.3s">
+                <div class="w-12 h-12 rounded-xl bg-emerald-900/30 flex items-center justify-center mx-auto mb-3"><i data-lucide="wind" class="w-6 h-6 text-emerald-400"></i></div>
+                <p class="text-3xl md:text-4xl font-extrabold text-forest-200 light-mode:text-forest-800"><span class="count-up" data-target="2500">0</span><span class="text-lg text-forest-500 light-mode:text-forest-600">t</span></p>
+                <p class="text-xs text-forest-500 mt-1 font-medium light-mode:text-forest-600" data-i18n="stat_co2">CO₂ Diserap/Tahun</p>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="section-divider"></div>
+
+<!-- BAGIAN: TENTANG, DAMPAK, MANFAAT (Disingkat untuk efisiensi, konten tetap sama) -->
+<section id="tentang" class="py-24 bg-forest-950 light-mode:bg-white relative overflow-hidden">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div class="reveal-left">
+                <span class="text-xs font-bold text-forest-500 tracking-[0.2em] uppercase mb-4 block light-mode:text-green-600" data-i18n="tentang_label">Tentang Program</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-forest-100 tracking-tight mb-6 leading-tight light-mode:text-forest-900" data-i18n="tentang_title">Apa Itu Gerakan <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Sejuta Pohon</span>?</h2>
+                <div class="space-y-4 text-forest-400 text-sm leading-relaxed light-mode:text-forest-600">
+                    <p data-i18n="tentang_p1">Gerakan Menanam Sejuta Pohon adalah program lingkungan yang diinisiasi untuk menghijaukan kembali Kota Lhokseumawe, Aceh. Melalui kolaborasi pemerintah, masyarakat, komunitas, dan sektor swasta, program ini bertujuan menanam satu juta pohon dalam beberapa tahun ke depan.</p>
+                    <p data-i18n="tentang_p2">Program ini tidak hanya tentang menanam — tetapi tentang membangun kesadaran lingkungan generasi muda dan berkontribusi nyata dalam mengurangi emisi karbon.</p>
+                    <p data-i18n="tentang_p3">Setiap pohon yang ditanam adalah investasi untuk masa depan anak-anak kita. Dari pohon bayangan jalan hingga hutan kota, setiap kontribusi yang Anda buat sangat berarti.</p>
+                </div>
+            </div>
+            <div class="reveal-right relative">
+                <div class="rounded-3xl overflow-hidden border border-forest-700/20 shadow-2xl light-mode:border-green-200">
+                    <img src="https://picsum.photos/seed/greenforest2026/700/500.jpg" alt="Hutan" class="w-full h-80 md:h-96 object-cover">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Di antara section satu dan section berikutnya -->
+<div class="section-divider"></div>
+
+<!-- ==================== DAMPAK ==================== -->
+<section id="dampak" class="py-24 bg-forest-950 relative light-mode:bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16 reveal">
+            <span class="text-xs font-bold text-red-400/80 tracking-[0.2em] uppercase mb-4 block light-mode:text-red-600" data-i18n="dampak_label">Mengapa Ini Penting</span>
+            <h2 class="text-3xl md:text-5xl font-extrabold text-forest-100 tracking-tight mb-4 light-mode:text-forest-900" data-i18n="dampak_title">Dampak Perubahan <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-400">Iklim</span></h2>
+            <p class="text-forest-400 max-w-2xl mx-auto light-mode:text-forest-600" data-i18n="dampak_desc">Lhokseumawe menghadapi tantangan iklim yang nyata. Tanpa aksi, dampaknya akan semakin parah bagi kehidupan masyarakat.</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-7 reveal hover:border-red-500/30 transition-all light-mode:bg-red-50/50 light-mode:border-red-200" style="transition-delay:0s">
+                <div class="w-12 h-12 rounded-xl bg-red-950/50 border border-red-800/20 flex items-center justify-center mb-5"><i data-lucide="thermometer-sun" class="w-6 h-6 text-red-400"></i></div>
+                <h3 class="font-bold text-forest-100 text-base mb-2 light-mode:text-forest-800" data-i18n="impact1_title">Suhu Meningkat</h3>
+                <p class="text-forest-500 text-sm leading-relaxed light-mode:text-forest-600" data-i18n="impact1_desc">Suhu rata-rata di Lhokseumawe naik 0.5°C per dekade. Hutan kota dapat menurunkan suhu lokal hingga 8°C melalui evapotranspirasi dan bayangan kanopi.</p>
+            </div>
+            <!-- Card 2 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-7 reveal hover:border-blue-500/30 transition-all light-mode:bg-blue-50/50 light-mode:border-blue-200" style="transition-delay:0.1s">
+                <div class="w-12 h-12 rounded-xl bg-blue-950/50 border border-blue-800/20 flex items-center justify-center mb-5"><i data-lucide="droplets" class="w-6 h-6 text-blue-400"></i></div>
+                <h3 class="font-bold text-forest-100 text-base mb-2 light-mode:text-forest-800" data-i18n="impact2_title">Banjir & Erosi</h3>
+                <p class="text-forest-500 text-sm leading-relaxed light-mode:text-forest-600" data-i18n="impact2_desc">Deforestasi meningkatkan aliran permukaan dan erosi tanah. Akar pohon menyerap air hujan hingga 70% lebih banyak, mengurangi risiko banjir signifikan.</p>
+            </div>
+            <!-- Card 3 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-7 reveal hover:border-amber-500/30 transition-all light-mode:bg-amber-50/50 light-mode:border-amber-200" style="transition-delay:0.2s">
+                <div class="w-12 h-12 rounded-xl bg-amber-950/50 border border-amber-800/20 flex items-center justify-center mb-5"><i data-lucide="cloud-hail" class="w-6 h-6 text-amber-400"></i></div>
+                <h3 class="font-bold text-forest-100 text-base mb-2 light-mode:text-forest-800" data-i18n="impact3_title">Kualitas Udara</h3>
+                <p class="text-forest-500 text-sm leading-relaxed light-mode:text-forest-600" data-i18n="impact3_desc">Polutan udara di kota meningkat seiring urbanisasi. Satu pohon dewasa mampu menyaring 22 kg polutan per tahun dan menghasilkan oksigen untuk 2 orang.</p>
+            </div>
+            <!-- Card 4 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-7 reveal hover:border-purple-500/30 transition-all light-mode:bg-purple-50/50 light-mode:border-purple-200" style="transition-delay:0.3s">
+                <div class="w-12 h-12 rounded-xl bg-purple-950/50 border border-purple-800/20 flex items-center justify-center mb-5"><i data-lucide="fish-off" class="w-6 h-6 text-purple-400"></i></div>
+                <h3 class="font-bold text-forest-100 text-base mb-2 light-mode:text-forest-800" data-i18n="impact4_title">Kerusakan Ekosistem</h3>
+                <p class="text-forest-500 text-sm leading-relaxed light-mode:text-forest-600" data-i18n="impact4_desc">Hilangnya habitat mengancam keanekaragaman hayati lokal. Pohon menjadi rumah bagi ratusan spesies serangga, burung, dan mikroorganisme penting.</p>
+            </div>
+            <!-- Card 5 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-7 reveal hover:border-teal-500/30 transition-all light-mode:bg-teal-50/50 light-mode:border-teal-200" style="transition-delay:0.4s">
+                <div class="w-12 h-12 rounded-xl bg-teal-950/50 border border-teal-800/20 flex items-center justify-center mb-5"><i data-lucide="waves" class="w-6 h-6 text-teal-400"></i></div>
+                <h3 class="font-bold text-forest-100 text-base mb-2 light-mode:text-forest-800" data-i18n="impact5_title">Rising Sea Level</h3>
+                <p class="text-forest-500 text-sm leading-relaxed light-mode:text-forest-600" data-i18n="impact5_desc">Sebagai kota pesisir, Lhokseumawe rentan terhadap naiknya permukaan laut. Mangrove dan vegetasi pesisir menjadi benteng alami pertahanan pertama.</p>
+            </div>
+            <!-- Card 6 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-7 reveal hover:border-orange-500/30 transition-all light-mode:bg-orange-50/50 light-mode:border-orange-200" style="transition-delay:0.5s">
+                <div class="w-12 h-12 rounded-xl bg-orange-950/50 border border-orange-800/20 flex items-center justify-center mb-5"><i data-lucide="heart-crack" class="w-6 h-6 text-orange-400"></i></div>
+                <h3 class="font-bold text-forest-100 text-base mb-2 light-mode:text-forest-800" data-i18n="impact6_title">Kesehatan Masyarakat</h3>
+                <p class="text-forest-500 text-sm leading-relaxed light-mode:text-forest-600" data-i18n="impact6_desc">Paparan polusi dan panas meningkatkan penyakit pernapasan dan heatstroke. Ruang hijau terbukti menurunkan stres dan meningkatkan kesehatan mental warga.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Di antara section satu dan section berikutnya -->
+<div class="section-divider"></div>
+<!-- ==================== MANFAAT ==================== -->
+<section id="manfaat" class="py-24 bg-forest-950 relative overflow-hidden light-mode:bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16 reveal">
+            <span class="text-xs font-bold text-forest-500 tracking-[0.2em] uppercase mb-4 block light-mode:text-green-600" data-i18n="manfaat_label">Manfaat Nyata</span>
+            <h2 class="text-3xl md:text-5xl font-extrabold text-forest-100 tracking-tight mb-4 light-mode:text-forest-900" data-i18n="manfaat_title">Apa yang Anda <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Dapatkan</span>?</h2>
+            <p class="text-forest-400 max-w-xl mx-auto light-mode:text-forest-600" data-i18n="manfaat_desc">Bergabung sebagai relawan bukan hanya memberi — Anda juga mendapatkan manfaat nyata untuk diri sendiri dan lingkungan.</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- Card 1 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-6 text-center reveal hover:border-forest-500/30 transition-all light-mode:bg-green-50/50 light-mode:border-green-200 light-mode:hover:border-green-400" style="transition-delay:0s">
+                <div class="w-14 h-14 rounded-2xl bg-forest-700/20 flex items-center justify-center mx-auto mb-4 light-mode:bg-white light-mode:text-green-600"><i data-lucide="award" class="w-7 h-7 text-forest-400"></i></div>
+                <h4 class="font-bold text-forest-200 text-sm mb-2 light-mode:text-forest-800" data-i18n="benefit1_title">Sertifikat Relawan</h4>
+                <p class="text-forest-500 text-xs leading-relaxed light-mode:text-forest-600" data-i18n="benefit1_desc">Dapatkan sertifikat resmi yang bisa digunakan untuk portofolio dan CV Anda.</p>
+            </div>
+            <!-- Card 2 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-6 text-center reveal hover:border-forest-500/30 transition-all light-mode:bg-green-50/50 light-mode:border-green-200 light-mode:hover:border-green-400" style="transition-delay:0.1s">
+                <div class="w-14 h-14 rounded-2xl bg-forest-700/20 flex items-center justify-center mx-auto mb-4 light-mode:bg-white light-mode:text-green-600"><i data-lucide="users-round" class="w-7 h-7 text-forest-400"></i></div>
+                <h4 class="font-bold text-forest-200 text-sm mb-2 light-mode:text-forest-800" data-i18n="benefit2_title">Jaringan Komunitas</h4>
+                <p class="text-forest-500 text-xs leading-relaxed light-mode:text-forest-600" data-i18n="benefit2_desc">Bertemu dan berkolaborasi dengan relawan dari berbagai latar belakang profesi.</p>
+            </div>
+            <!-- Card 3 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-6 text-center reveal hover:border-forest-500/30 transition-all light-mode:bg-green-50/50 light-mode:border-green-200 light-mode:hover:border-green-400" style="transition-delay:0.2s">
+                <div class="w-14 h-14 rounded-2xl bg-forest-700/20 flex items-center justify-center mx-auto mb-4 light-mode:bg-white light-mode:text-green-600"><i data-lucide="book-open" class="w-7 h-7 text-forest-400"></i></div>
+                <h4 class="font-bold text-forest-200 text-sm mb-2 light-mode:text-forest-800" data-i18n="benefit3_title">Edukasi Lingkungan</h4>
+                <p class="text-forest-500 text-xs leading-relaxed light-mode:text-forest-600" data-i18n="benefit3_desc">Pelajari teknik menanam yang benar, pemilihan jenis pohon, dan perawatan tanaman.</p>
+            </div>
+            <!-- Card 4 -->
+            <div class="bg-gradient-to-br from-forest-900/60 to-forest-950 border border-forest-700/30 rounded-2xl p-6 text-center reveal hover:border-forest-500/30 transition-all light-mode:bg-green-50/50 light-mode:border-green-200 light-mode:hover:border-green-400" style="transition-delay:0.3s">
+                <div class="w-14 h-14 rounded-2xl bg-forest-700/20 flex items-center justify-center mx-auto mb-4 light-mode:bg-white light-mode:text-green-600"><i data-lucide="smile" class="w-7 h-7 text-forest-400"></i></div>
+                <h4 class="font-bold text-forest-200 text-sm mb-2 light-mode:text-forest-800" data-i18n="benefit4_title">Kebanggaan & Warisan</h4>
+                <p class="text-forest-500 text-xs leading-relaxed light-mode:text-forest-600" data-i18n="benefit4_desc">Tinggalkan warisan hijau yang bisa dinikmati generasi mendatang. Ini warisan terbaik.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Di antara section satu dan section berikutnya -->
+<div class="section-divider"></div>
+<!-- BAGIAN: FLOWCHART ALUR -->
+<!-- BAGIAN: FLOWCHART ALUR (DIPERBAIKI) -->
+<section id="alur" class="py-20 bg-forest-950 relative overflow-hidden light-mode:bg-white">
+    <!-- Background decoration -->
+    <div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-forest-900/20 to-transparent pointer-events-none"></div>
+    
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+        <div class="text-center mb-16 reveal">
+            <span class="text-xs font-bold text-forest-500 tracking-[0.2em] uppercase mb-4 block light-mode:text-green-600" data-i18n="alur_label">Alur Bergabung</span>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-forest-100 tracking-tight mb-4 light-mode:text-forest-900" data-i18n="alur_title">Perjalanan Menjadi <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Pahlawan Hijau</span></h2>
+            <p class="text-forest-400 max-w-2xl mx-auto light-mode:text-forest-600" data-i18n="alur_desc">Prosesnya sederhana. Daftar, Tanam, dan Dapatkan penghargaan atas kontribusi Anda untuk bumi.</p>
+        </div>
+
+        <!-- Flowchart Grid -->
+        <!-- Ubah gap-8 menjadi gap-12 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 relative">
+            <!-- ... isi kartu ... -->
+            
+            <!-- Step 1 -->
+            <div class="relative group reveal">
+                <div class="bg-forest-900/40 border border-forest-700/30 rounded-2xl p-6 h-full hover:border-forest-500/50 transition-colors light-mode:bg-green-50 light-mode:border-green-200 light-mode:hover:border-green-400">
+                    <div class="w-12 h-12 rounded-xl bg-forest-800/50 flex items-center justify-center mb-4 text-forest-300 group-hover:scale-110 transition-transform light-mode:bg-white light-mode:text-green-600 shadow-sm">
+                        <i data-lucide="user-plus" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-forest-700 text-forest-200 text-[10px] font-bold px-2 py-1 rounded light-mode:bg-green-200 light-mode:text-green-800">LANGKAH 1</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-forest-100 mb-2 light-mode:text-forest-800" data-i18n="step1_title">Isi Formulir</h3>
+                    <p class="text-sm text-forest-400 leading-relaxed light-mode:text-forest-600" data-i18n="step1_desc">Lengkapi data diri Anda melalui formulir pendaftaran di halaman ini.</p>
+                </div>
+                <!-- KONEKTOR ANIMASI (Desktop & Mobile) -->
+                <div class="flow-connector horizontal hidden lg:block"></div>
+                <div class="flow-connector vertical lg:hidden"></div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative group reveal" style="transition-delay: 0.1s">
+                <div class="bg-forest-900/40 border border-forest-700/30 rounded-2xl p-6 h-full hover:border-forest-500/50 transition-colors light-mode:bg-green-50 light-mode:border-green-200 light-mode:hover:border-green-400">
+                    <div class="w-12 h-12 rounded-xl bg-forest-800/50 flex items-center justify-center mb-4 text-forest-300 group-hover:scale-110 transition-transform light-mode:bg-white light-mode:text-green-600 shadow-sm">
+                        <i data-lucide="message-circle" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-forest-700 text-forest-200 text-[10px] font-bold px-2 py-1 rounded light-mode:bg-green-200 light-mode:text-green-800">LANGKAH 2</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-forest-100 mb-2 light-mode:text-forest-800" data-i18n="step2_title">Verifikasi Admin</h3>
+                    <p class="text-sm text-forest-400 leading-relaxed light-mode:text-forest-600" data-i18n="step2_desc">Tim kami akan menghubungi WhatsApp Anda untuk konfirmasi data.</p>
+                </div>
+                <div class="flow-connector horizontal hidden lg:block"></div>
+                <div class="flow-connector vertical lg:hidden"></div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative group reveal" style="transition-delay: 0.2s">
+                <div class="bg-forest-900/40 border border-forest-700/30 rounded-2xl p-6 h-full hover:border-forest-500/50 transition-colors light-mode:bg-green-50 light-mode:border-green-200 light-mode:hover:border-green-400">
+                    <div class="w-12 h-12 rounded-xl bg-forest-800/50 flex items-center justify-center mb-4 text-forest-300 group-hover:scale-110 transition-transform light-mode:bg-white light-mode:text-green-600 shadow-sm">
+                        <i data-lucide="package" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-forest-700 text-forest-200 text-[10px] font-bold px-2 py-1 rounded light-mode:bg-green-200 light-mode:text-green-800">LANGKAH 3</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-forest-100 mb-2 light-mode:text-forest-800" data-i18n="step3_title">Ambil Bibit</h3>
+                    <p class="text-sm text-forest-400 leading-relaxed light-mode:text-forest-600" data-i18n="step3_desc">Datang ke titik kumpul terdekat untuk mengambil bibit pohon.</p>
+                </div>
+                <div class="flow-connector vertical lg:hidden"></div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="relative group reveal" style="transition-delay: 0.3s">
+                <div class="bg-forest-900/40 border border-forest-700/30 rounded-2xl p-6 h-full hover:border-forest-500/50 transition-colors light-mode:bg-green-50 light-mode:border-green-200 light-mode:hover:border-green-400">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-900/30 flex items-center justify-center mb-4 text-emerald-300 group-hover:scale-110 transition-transform light-mode:bg-white light-mode:text-green-600 shadow-sm">
+                        <i data-lucide="trees" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-emerald-800 text-emerald-200 text-[10px] font-bold px-2 py-1 rounded light-mode:bg-green-200 light-mode:text-green-800">AKSI</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-forest-100 mb-2 light-mode:text-forest-800" data-i18n="step4_title">Tanam Pohon</h3>
+                    <p class="text-sm text-forest-400 leading-relaxed light-mode:text-forest-600" data-i18n="step4_desc">Lakukan penanaman di lokasi yang telah disepakati bersama.</p>
+                </div>
+                <div class="flow-connector horizontal hidden lg:block"></div>
+                <div class="flow-connector vertical lg:hidden"></div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="relative group reveal" style="transition-delay: 0.4s">
+                <div class="bg-forest-900/40 border border-forest-700/30 rounded-2xl p-6 h-full hover:border-forest-500/50 transition-colors light-mode:bg-green-50 light-mode:border-green-200 light-mode:hover:border-green-400">
+                    <div class="w-12 h-12 rounded-xl bg-forest-800/50 flex items-center justify-center mb-4 text-forest-300 group-hover:scale-110 transition-transform light-mode:bg-white light-mode:text-green-600 shadow-sm">
+                        <i data-lucide="camera" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-forest-700 text-forest-200 text-[10px] font-bold px-2 py-1 rounded light-mode:bg-green-200 light-mode:text-green-800">LANGKAH 5</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-forest-100 mb-2 light-mode:text-forest-800" data-i18n="step5_title">Lapor Bukti</h3>
+                    <p class="text-sm text-forest-400 leading-relaxed light-mode:text-forest-600" data-i18n="step5_desc">Kirim foto dokumentasi penanaman ke WhatsApp admin.</p>
+                </div>
+                <div class="flow-connector horizontal hidden lg:block"></div>
+                <div class="flow-connector vertical lg:hidden"></div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="relative group reveal" style="transition-delay: 0.5s">
+                <div class="bg-gradient-to-br from-forest-800 to-forest-900 border border-forest-500/30 rounded-2xl p-6 h-full relative overflow-hidden light-mode:bg-white light-mode:border-yellow-300">
+                    <!-- Glow Effect -->
+                    <div class="absolute -top-10 -right-10 w-24 h-24 bg-yellow-500/20 rounded-full blur-2xl"></div>
+                    
+                    <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center mb-4 text-yellow-400 group-hover:scale-110 transition-transform shadow-lg">
+                        <i data-lucide="award" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-yellow-500/20 text-yellow-300 text-[10px] font-bold px-2 py-1 rounded">SELESAI</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-forest-100 mb-2 light-mode:text-forest-800" data-i18n="step6_title">Dapatkan Sertifikat</h3>
+                    <p class="text-sm text-forest-300 leading-relaxed light-mode:text-forest-600" data-i18n="step6_desc">Terima sertifikat relawan digital sebagai tanda penghargaan.</p>
+                </div>
+                <!-- Step terakhir tidak perlu konektor -->
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Di antara section satu dan section berikutnya -->
+<div class="section-divider"></div>
+
+<!-- BAGIAN: FORM PENDAFTARAN -->
+<section id="form" class="relative py-24 bg-forest-950 overflow-hidden light-mode:bg-green-50/30">
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+        <div class="text-center mb-14 reveal">
+            <span class="text-xs font-bold text-forest-500 tracking-[0.2em] uppercase mb-4 block light-mode:text-green-600" data-i18n="form_label">Bergabunglah</span>
+            <h2 class="text-3xl md:text-5xl font-extrabold text-forest-100 tracking-tight mb-4 light-mode:text-forest-900" data-i18n="form_title">Jadilah Bagian dari <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Perubahan</span></h2>
+        </div>
+        <div class="grid lg:grid-cols-5 gap-8">
+            <!-- Form Input -->
+            <div class="lg:col-span-3 reveal-left">
+                <form id="registration-form" class="bg-gradient-to-br from-forest-900/80 to-forest-950 border border-forest-700/30 rounded-3xl p-8 md:p-10 space-y-5 light-mode:bg-white light-mode:border-green-200 light-mode:shadow-xl">
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_nama">Nama Lengkap *</label>
+                            <input type="text" id="f-nama" required class="form-input w-full px-4 py-3 rounded-xl text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_motivasi">Motivasi Bergabung *</label>
+                            <textarea id="f-motivasi" rows="3" required class="form-input w-full px-4 py-3 rounded-xl text-sm resize-none" placeholder="Apa alasan Anda ingin menanam pohon?"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_wa">No. WhatsApp *</label>
+                            <input type="tel" id="f-wa" required class="form-input w-full px-4 py-3 rounded-xl text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_email">Email</label>
+                            <input type="email" id="f-email" class="form-input w-full px-4 py-3 rounded-xl text-sm" placeholder="email@contoh.com">
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_usia">Usia *</label>
+                            <input type="number" id="f-usia" required min="10" max="100" class="form-input w-full px-4 py-3 rounded-xl text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_pekerjaan">Pekerjaan *</label>
+                            <select id="f-pekerjaan" required class="form-input w-full px-4 py-3 rounded-xl text-sm">
+                                <option value="" data-i18n="form_pekerjaan_placeholder">Pilih pekerjaan</option>
+                                <option data-i18n="job_student">Pelajar / Mahasiswa</option>
+                                <option data-i18n="job_civil">PNS / ASN</option>
+                                <option data-i18n="job_private">Swasta</option>
+                                <option data-i18n="job_teacher">Guru / Dosen</option>
+                                <option data-i18n="job_entrepreneur">Wirausaha</option>
+                                <option data-i18n="job_other">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_alamat">Alamat di Lhokseumawe *</label>
+                        <input type="text" id="f-alamat" required class="form-input w-full px-4 py-3 rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_jumlah">Jumlah Pohon Target *</label>
+                        <select id="f-jumlah" required class="form-input w-full px-4 py-3 rounded-xl text-sm">
+                            <option value="" data-i18n="form_jumlah_placeholder">Pilih jumlah</option>
+                            <option value="1">1 Pohon</option>
+                            <option value="5">5 Pohon</option>
+                            <option value="10">10 Pohon</option>
+                            <option value="25">25 Pohon</option>
+                            <option value="50">50 Pohon</option>
+                            <option value="100">100 Pohon</option>
+                            <option value="500">500 Pohon (Komunitas)</option>
+                            <option value="1000">1.000 Pohon (Institusi)</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="submit-btn" class="btn-primary w-full px-8 py-4 rounded-2xl font-bold text-white text-base flex items-center gap-2 justify-center">
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                        <span data-i18n="form_submit">Daftar Sebagai Relawan</span>
+                    </button>
+                </form>
+            </div>
+            
+                        <!-- Sidebar Stats -->
+            <div class="lg:col-span-2 reveal-right space-y-6">
+                <!-- 1. Kotak Progress -->
+                <div class="bg-gradient-to-br from-forest-900/80 to-forest-950 border border-forest-700/30 rounded-3xl p-6 light-mode:bg-white light-mode:border-green-200 light-mode:shadow-lg">
+                    <h4 class="font-bold text-forest-200 text-sm mb-4 flex items-center gap-2 light-mode:text-forest-800"><i data-lucide="bar-chart-3" class="w-4 h-4 text-forest-400"></i><span data-i18n="progress_title">Progress Pendaftaran</span></h4>
+                    <div class="flex items-center gap-4">
+                        <div class="relative w-20 h-20 flex-shrink-0">
+                            <svg class="w-20 h-20" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(34,197,94,0.1)" stroke-width="6"/><circle id="progress-ring" cx="40" cy="40" r="34" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" class="progress-ring-circle" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
+                            <div class="absolute inset-0 flex items-center justify-center"><span class="text-sm font-extrabold text-forest-200 light-mode:text-forest-800" id="progress-pct">0%</span></div>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-extrabold text-forest-200 light-mode:text-forest-800" id="total-registrants">0</p>
+                            <p class="text-xs text-forest-500 light-mode:text-forest-600" data-i18n="progress_target">dari target 10.000 relawan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Kotak Tahukah Anda (Sudah dipindahkan ke dalam container di atas) -->
+                <div class="bg-gradient-to-br from-amber-950/30 to-forest-950 border border-amber-700/20 rounded-3xl p-6 mt-6 light-mode:bg-amber-50/30 light-mode:border-amber-200">
+                    <h4 class="font-bold text-amber-300 text-sm mb-4 flex items-center gap-2 light-mode:text-amber-700">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                        <span data-i18n="didyouknow_title">Tahukah Anda?</span>
+                    </h4>
+                    <ul class="space-y-2 text-xs text-amber-200/70 leading-relaxed light-mode:text-amber-800/80">
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-500 mt-0.5">•</span>
+                            <span data-i18n="fact_1">1 hektar hutan menyerap CO₂ setara mobil dikendarai 40.000 km</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-500 mt-0.5">•</span>
+                            <span data-i18n="fact_2">Pohon beringin bisa menyerap 500 liter air per hari</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-500 mt-0.5">•</span>
+                            <span data-i18n="fact_3">Hutan kota bisa menurunkan suhu udara hingga 8°C</span>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div> <!-- Penutup Sidebar yang benar (satu-satunya penutup di akhir) -->
+            
+        </div>
+    </div>
+    
+</section>
+
+<!-- BAGIAN: DATA TABLE -->
+<section class="py-20 bg-forest-950 relative light-mode:bg-white">
+    <div class="max-w-7xl mx-auto px-6 reveal">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+        <h3 class="text-xl font-bold text-forest-200 flex items-center gap-2 light-mode:text-forest-800"><i data-lucide="table" class="w-5 h-5 text-forest-400"></i><span data-i18n="datatable_title">Data Peserta Terdaftar</span></h3>
+    </div>
+    
+    <a href="admin.html" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-forest-800/50 text-forest-300 hover:bg-forest-800 transition-colors text-sm">
+        <i data-lucide="shield" class="w-4 h-4"></i>
+        <span>Panel Admin</span>
+    </a>
+</div>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-forest-800/30 light-mode:border-green-200">
+            <table class="data-table w-full text-sm">
+                <thead>
+                    <tr>
+                        <th class="text-left px-5 py-3 text-xs font-bold text-forest-400 tracking-wider uppercase rounded-tl-2xl light-mode:text-forest-600" data-i18n="th_no">No</th>
+                        <th class="text-left px-5 py-3 text-xs font-bold text-forest-400 tracking-wider uppercase light-mode:text-forest-600" data-i18n="th_nama">Nama</th>
+                        <th class="text-left px-5 py-3 text-xs font-bold text-forest-400 tracking-wider uppercase light-mode:text-forest-600" data-i18n="th_pekerjaan">Pekerjaan</th>
+                        <th class="text-left px-5 py-3 text-xs font-bold text-forest-400 tracking-wider uppercase" data-i18n="th_pohon">Pohon</th>
+                        <!-- Kolom Komentar Baru -->
+                        <th class="text-left px-5 py-3 text-xs font-bold text-forest-400 tracking-wider uppercase light-mode:text-forest-600" data-i18n="th_motivasi">Motivasi</th>
+                        <th class="text-left px-5 py-3 text-xs font-bold text-forest-400 tracking-wider uppercase rounded-tr-2xl light-mode:text-forest-600" data-i18n="th_tanggal">Tgl Daftar</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <!-- Data will be injected here -->
+                    <tr><td colspan="6" class="px-5 py-12 text-center text-forest-600"><div class="inline-flex items-center justify-center w-10 h-10 mb-3 rounded-full bg-forest-900 light-mode:bg-green-50"><i data-lucide="inbox" class="w-5 h-5 opacity-30"></i></div><p class="text-sm" data-i18n="empty_table">Belum ada data peserta</p></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination Controls -->
+        <div class="flex items-center justify-between mt-4 px-2">
+            <div class="flex items-center gap-2 text-sm text-forest-400">
+                <span>Tampilkan:</span>
+                <select id="rows-per-page" onchange="App.UI.changeRowsPerPage(this.value)" class="bg-forest-800/50 border border-forest-700/30 rounded-lg px-2 py-1 text-forest-200 text-sm focus:outline-none focus:border-forest-500">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <span>baris per halaman</span>
+            </div>
+            <div class="flex items-center gap-2" id="pagination-controls">
+                <!-- Pagination buttons injected here -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BAGIAN: KOMENTAR -->
+<section class="py-20 bg-forest-950 relative light-mode:bg-green-50">
+    <div class="max-w-4xl mx-auto px-6">
+        <div class="text-center mb-12 reveal">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest-800/40 border border-forest-600/20 mb-6">
+                <i data-lucide="message-circle" class="w-4 h-4 text-forest-400"></i>
+                <span class="text-xs font-semibold text-forest-300 tracking-wider uppercase" data-i18n="comments_badge">Diskusi Komunitas</span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-forest-100 tracking-tight mb-4 light-mode:text-forest-900" data-i18n="comments_title">Komentar & Diskusi</h2>
+            <p class="text-forest-400 max-w-xl mx-auto light-mode:text-forest-600" data-i18n="comments_desc">Bagikan motivasi, ide, atau pengalaman Anda. Hanya peserta terdaftar yang dapat berkomentar.</p>
+        </div>
+
+        <!-- Sort Tabs -->
+        <div class="flex justify-center mb-8 reveal">
+            <div class="sort-tabs">
+                <button class="sort-tab active" onclick="App.Comments.setSort('newest')" data-i18n="sort_newest">Terbaru</button>
+                <button class="sort-tab" onclick="App.Comments.setSort('oldest')" data-i18n="sort_oldest">Terlama</button>
+                <button class="sort-tab" onclick="App.Comments.setSort('popular')" data-i18n="sort_popular">Terpopuler</button>
+            </div>
+        </div>
+
+        <!-- Verification Form (shown if not verified) -->
+        <div id="comment-verify-section" class="verify-form reveal">
+            <div class="w-16 h-16 rounded-2xl bg-forest-700/30 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="shield-check" class="w-8 h-8 text-forest-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-forest-100 mb-2 light-mode:text-forest-800" data-i18n="verify_title">Verifikasi Peserta</h3>
+            <p class="text-sm text-forest-400 mb-6 light-mode:text-forest-600" data-i18n="verify_desc">Masukkan nama dan nomor WhatsApp yang Anda daftarkan untuk dapat berkomentar.</p>
+            
+            <div class="max-w-sm mx-auto space-y-4 text-left">
+                <div>
+                    <label class="block text-xs text-forest-500 mb-2 ml-1" data-i18n="verify_nama">Nama Lengkap</label>
+                    <input type="text" id="verify-nama" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Nama sesuai pendaftaran">
+                </div>
+                <div>
+                    <label class="block text-xs text-forest-500 mb-2 ml-1" data-i18n="verify_wa">Nomor WhatsApp</label>
+                    <input type="text" id="verify-whatsapp" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="08xxxxxxxxxx">
+                </div>
+                <button onclick="App.Comments.verifyParticipant()" class="w-full btn-primary py-3 rounded-xl font-semibold text-white flex items-center justify-center gap-2" data-i18n="verify_btn">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    Verifikasi Sekarang
+                </button>
+                <p id="verify-error" class="text-xs text-red-400 hidden text-center mt-2"></p>
+            </div>
+        </div>
+
+        <!-- Comment Form (shown after verified) -->
+        <div id="comment-form-section" class="hidden comment-form mb-8 reveal">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="comment-avatar" id="comment-avatar">?</div>
+                <div class="flex-1">
+                    <p class="font-semibold text-forest-200 text-sm light-mode:text-forest-800" id="comment-username">Peserta</p>
+                    <span class="verified-badge">
+                        <i data-lucide="check-circle-2" class="w-3 h-3"></i>
+                        Terverifikasi
+                    </span>
+                </div>
+                <button onclick="App.Comments.logout()" class="text-xs text-forest-500 hover:text-forest-300 flex items-center gap-1">
+                    <i data-lucide="log-out" class="w-3 h-3"></i>
+                    <span data-i18n="logout">Keluar</span>
+                </button>
+            </div>
+            
+            <div id="reply-indicator" class="hidden mb-3 p-3 bg-forest-800/50 rounded-lg text-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-forest-400">Membalas <span id="reply-to-name" class="text-forest-300 font-medium"></span></span>
+                    <button onclick="App.Comments.cancelReply()" class="text-forest-500 hover:text-forest-300">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <textarea id="comment-input" class="comment-input" placeholder="Tulis komentar Anda..." rows="3"></textarea>
+            <div class="flex items-center justify-between mt-3">
+                <span class="text-xs text-forest-500" data-i18n="comment_hint">Komentar akan ditampilkan publik</span>
+                <button onclick="App.Comments.submitComment()" class="btn-primary px-6 py-2 rounded-xl font-semibold text-white text-sm flex items-center gap-2">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    <span data-i18n="comment_submit">Kirim Komentar</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Comments List -->
+        <div id="comments-list" class="comment-section space-y-3 reveal">
+            <div class="text-center py-12 text-forest-500">
+                <i data-lucide="message-square" class="w-12 h-12 mx-auto mb-4 opacity-30"></i>
+                <p data-i18n="comments_empty">Belum ada komentar. Jadilah yang pertama berdiskusi!</p>
+            </div>
+        </div>
+
+        <!-- Load More -->
+        <div id="comments-load-more" class="hidden text-center mt-6">
+            <button onclick="App.Comments.loadMore()" class="px-6 py-2 rounded-xl bg-forest-800/50 text-forest-300 text-sm hover:bg-forest-800 transition-colors" data-i18n="load_more">Muat Lebih Banyak</button>
+        </div>
+    </div>
+</section>
+
+<!-- FLOATING MOBILE CONTROLS -->
+<div id="mobile-controls" class="md:hidden">
+    <button onclick="App.UI.toggleTheme()" id="mobile-theme-btn" aria-label="Toggle theme">
+        <i data-lucide="moon" class="w-[18px] h-[18px]" id="mobile-theme-icon"></i>
+    </button>
+    <div class="ctrl-divider w-px h-6 bg-forest-600 mx-2"></div>
+    <button onclick="App.I18n.set('id')" id="mob-lang-id" class="text-xs font-bold text-forest-300 opacity-50 hover:opacity-100 transition-opacity px-2">ID</button>
+    <button onclick="App.I18n.set('en')" id="mob-lang-en" class="text-xs font-bold text-forest-300 opacity-50 hover:opacity-100 transition-opacity px-2">EN</button>
+</div>
+
+<!-- FOOTER -->
+<footer class="border-t border-forest-800/30 bg-forest-950 py-16 light-mode:bg-white light-mode:border-green-200">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid md:grid-cols-3 gap-12 mb-12">
+            <!-- Kolom 1: Brand & Deskripsi -->
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-forest-500 to-forest-700 flex items-center justify-center">
+                        <i data-lucide="tree-pine" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-forest-200 text-sm light-mode:text-forest-800" data-i18n="footer_brand">Sejuta Pohon</span>
+                        <span class="block text-[10px] text-forest-600 tracking-widest uppercase light-mode:text-forest-500" data-i18n="footer_city">Lhokseumawe 2026</span>
+                    </div>
+                </div>
+                <p class="text-sm text-forest-600 leading-relaxed light-mode:text-forest-500" data-i18n="footer_desc">
+                    Program penanaman satu juta pohon untuk menyelamatkan iklim dan masa depan Kota Lhokseumawe, Aceh.
+                </p>
+            </div>
+
+            <!-- Kolom 2: Kontak -->
+            <div>
+                <h4 class="font-bold text-forest-300 text-sm mb-4 light-mode:text-forest-800" data-i18n="footer_contact_title">Kontak</h4>
+                <div class="space-y-3 text-sm text-forest-500 light-mode:text-forest-600">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-forest-600"></i>
+                        <span data-i18n="footer_address">Kota Lhokseumawe, Aceh</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="phone" class="w-4 h-4 text-forest-600"></i>
+                        <span>+62 812-XXXX-XXXX</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="mail" class="w-4 h-4 text-forest-600"></i>
+                        <span>sejutapohon@lhokseumawe.id</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kolom 3: Navigasi -->
+            <div>
+                <h4 class="font-bold text-forest-300 text-sm mb-4 light-mode:text-forest-800" data-i18n="footer_nav_title">Navigasi</h4>
+                <div class="space-y-2 text-sm">
+                    <a href="#tentang" class="block text-forest-500 hover:text-forest-300 transition-colors light-mode:text-forest-600 light-mode:hover:text-forest-800" data-i18n="footer_nav_tentang">Tentang Program</a>
+                    <a href="#dampak" class="block text-forest-500 hover:text-forest-300 transition-colors light-mode:text-forest-600 light-mode:hover:text-forest-800" data-i18n="footer_nav_dampak">Dampak Perubahan Iklim</a>
+                    <a href="#manfaat" class="block text-forest-500 hover:text-forest-300 transition-colors light-mode:text-forest-600 light-mode:hover:text-forest-800" data-i18n="footer_nav_manfaat">Manfaat Jangka Panjang</a>
+                    <a href="#form" class="block text-forest-500 hover:text-forest-300 transition-colors light-mode:text-forest-600 light-mode:hover:text-forest-800" data-i18n="footer_nav_form">Formulir Pendaftaran</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Garis Pemisah Footer -->
+        <div class="section-divider mb-8"></div>
+
+        <!-- Copyright -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="text-xs text-forest-700 light-mode:text-forest-500" data-i18n="copyright"> 2026 Gerakan Menanam Sejuta Pohon Kota Lhokseumawe.</p>
+            <p class="text-xs text-forest-700 italic light-mode:text-forest-500" data-i18n="footer_tagline">"Menanam Hari Ini, Bernafas Esok Hari."</p>
+        </div>
+    </div>
+</footer>
+<div class="h-20 md:hidden"></div>
+
+<!-- ============================================================ -->
+<!-- MODAL DETAIL (FLOATING PAGE) -->
+<!-- ============================================================ -->
+<div id="detail-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="modal-content w-full max-w-lg bg-forest-900 border border-forest-700/50 rounded-3xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300 light-mode:bg-white light-mode:border-green-200">
+        <div class="p-8">
+            <div class="flex justify-between items-start mb-6">
+                <div class="w-12 h-12 bg-forest-700/30 rounded-2xl flex items-center justify-center text-forest-400 light-mode:bg-green-100 light-mode:text-green-600">
+                    <i data-lucide="user-check" class="w-6 h-6"></i>
+                </div>
+                <button onclick="window.closeDetail()" class="p-2 hover:bg-red-500/10 text-forest-500 hover:text-red-500 rounded-xl transition-all light-mode:text-forest-400 light-mode:hover:text-red-500">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div id="detail-body" class="space-y-4">
+                <!-- Content will be injected via JS -->
+            </div>
+        </div>
+        <div class="bg-forest-800/40 p-6 flex justify-end gap-3 border-t border-forest-700/50 light-mode:bg-green-50/30 light-mode:border-green-200">
+            <button onclick="window.closeDetail()" class="px-6 py-2.5 rounded-xl text-sm font-semibold bg-forest-700 hover:bg-forest-600 text-forest-100 transition-all light-mode:bg-green-200 light-mode:text-green-900 light-mode:hover:bg-green-300">Tutup</button>
+        </div>
+    </div>
+
+<!-- ============================================================ -->
+<!-- MODULAR JAVASCRIPT LOGIC -->
+<!-- ============================================================ -->
+<script type="module">
+/**
+ * APP NAMESPACE
+ * Menampung seluruh logika aplikasi agar bersih dan modular.
+ */
+const App = {
+    // --- 1. CONFIGURATION ---
+    Config: {
+        API_URL: '', // Empty = same origin, or 'https://your-app.vercel.app'
+        ADMIN_PASS: 'sejutapohon2025', // Password Admin
+        STORAGE_KEY: 'sejutaPohon_Lhokseumawe',
+        SESSION_KEY: 'sp_admin_auth',
+        SESSION_DURATION: 4 * 60 * 60 * 1000 // 4 jam
+    },
+
+    // --- 2. LOCALIZATION (I18n) ---
+    I18n: {
+        current: 'id',
+        dictionary: {
+            id: {
+                brand_name: "SEJUTA POHON", brand_city: "Lhokseumawe",
+                nav_tentang: "Tentang", nav_dampak: "Dampak", nav_manfaat: "Manfaat", nav_daftar: "Daftar Sekarang", nav_admin: "Admin",
+                hero_badge: "Program Aktif 2026", hero_line1: "Menanam", hero_line2: "Sejuta Pohon", hero_line3: "Kota Lhokseumawe",
+                hero_desc: "Gerakan bersama menyelamatkan bumi dari krisis iklim, satu pohon pada satu waktu. Mari wujudkan Lhokseumawe yang hijau dan berkelanjutan.",
+                hero_cta: "Daftar Sebagai Relawan", hero_cta2: "Pelajari Lebih Lanjut",
+                stat_trees: "Target Pohon", stat_volunteers: "Target Relawan", stat_kecamatan: "Kecamatan", stat_co2: "CO₂ Diserap/Tahun",
+                tentang_label: "Tentang Program", tentang_title: 'Apa Itu Gerakan <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Sejuta Pohon</span>?',
+                // Di dalam dictionary: { id: { ... } }
+                tentang_p1: "Gerakan Menanam Sejuta Pohon adalah program lingkungan yang diinisiasi untuk menghijaukan kembali Kota Lhokseumawe, Aceh. Melalui kolaborasi pemerintah, masyarakat, komunitas, dan sektor swasta, program ini bertujuan menanam satu juta pohon dalam beberapa tahun ke depan.",
+                tentang_p2: "Program ini tidak hanya tentang menanam — tetapi tentang membangun kesadaran lingkungan generasi muda, menciptakan ruang terbuka hijau yang berkualitas, dan berkontribusi nyata dalam mengurangi emisi karbon di tingkat lokal.",
+                tentang_p3: "Setiap pohon yang ditanam adalah investasi untuk masa depan anak cucu kita. Dari pohon peneduh jalan hingga hutan kota, setiap kontribusi Anda sangat berarti.",
+                form_label: "Bergabunglah", form_title: 'Jadilah Bagian dari <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Perubahan</span>',
+                form_nama: "Nama Lengkap *", form_wa: "No. WhatsApp *", form_email: "Email", form_usia: "Usia *", form_alamat: "Alamat di Lhokseumawe *",
+                form_motivasi: "Motivasi Bergabung *",
+                form_pekerjaan: "Pekerjaan *", form_pekerjaan_placeholder: "Pilih pekerjaan",
+                job_student: "Pelajar / Mahasiswa", job_civil: "PNS / ASN", job_private: "Swasta", job_teacher: "Guru / Dosen", job_entrepreneur: "Wirausaha", job_other: "Lainnya",
+                form_jumlah: "Jumlah Pohon Target *", form_jumlah_placeholder: "Pilih jumlah",
+                form_submit: "Daftar Sebagai Relawan",
+                progress_title: "Progress Pendaftaran", progress_target: "dari target 10.000 relawan",
+                datatable_title: "Data Peserta Terdaftar", empty_table: "Belum ada data peserta",
+                th_no: "No", th_nama: "Nama", th_pekerjaan: "Pekerjaan", th_pohon: "Pohon", th_motivasi: "Motivasi", th_tanggal: "Tgl Daftar",
+                copyright: " 2026 Gerakan Menanam Sejuta Pohon Kota Lhokseumawe.",
+                toast_success_title: "Berhasil!", toast_error_title: "Perhatian",
+                err_fill_required: "Mohon lengkapi semua field yang wajib diisi.",
+                err_wa_format: "Format WhatsApp tidak valid. Gunakan 08xxx.",
+                sending: "Mengirim...", success_db: ", data tersimpan ke Database.",
+                success_no_db: ", Anda telah terdaftar sebagai relawan.",
+                err_connect: "Gagal terhubung ke Database.",
+                alur_label: "Alur Bergabung",
+                alur_title: 'Perjalanan Menjadi <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Pahlawan Hijau</span>',
+                alur_desc: "Prosesnya sederhana. Daftar, Tanam, dan Dapatkan penghargaan atas kontribusi Anda untuk bumi.",
+                step1_title: "Isi Formulir", step1_desc: "Lengkapi data diri Anda melalui formulir pendaftaran di halaman ini.",
+                step2_title: "Verifikasi Admin", step2_desc: "Tim kami akan menghubungi WhatsApp Anda untuk konfirmasi data.",
+                step3_title: "Ambil Bibit", step3_desc: "Datang ke titik kumpul terdekat untuk mengambil bibit pohon.",
+                step4_title: "Tanam Pohon", step4_desc: "Lakukan penanaman di lokasi yang telah disepakati bersama.",
+                step5_title: "Lapor Bukti", step5_desc: "Kirim foto dokumentasi penanaman ke WhatsApp admin.",
+                step6_title: "Dapatkan Sertifikat", step6_desc: "Terima sertifikat relawan digital sebagai tanda penghargaan.",
+                dampak_label: "Mengapa Ini Penting",
+                dampak_title: 'Dampak Perubahan <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-400">Iklim</span>',
+                dampak_desc: "Lhokseumawe menghadapi tantangan iklim yang nyata. Tanpa aksi, dampaknya akan semakin parah bagi kehidupan masyarakat.",
+                impact1_title: "Suhu Meningkat", impact1_desc: "Suhu rata-rata di Lhokseumawe naik 0.5°C per dekade. Hutan kota dapat menurunkan suhu lokal hingga 8°C melalui evapotranspirasi dan bayangan kanopi.",
+                impact2_title: "Banjir & Erosi", impact2_desc: "Deforestasi meningkatkan aliran permukaan dan erosi tanah. Akar pohon menyerap air hujan hingga 70% lebih banyak, mengurangi risiko banjir signifikan.",
+                impact3_title: "Kualitas Udara", impact3_desc: "Polutan udara di kota meningkat seiring urbanisasi. Satu pohon dewasa mampu menyaring 22 kg polutan per tahun dan menghasilkan oksigen untuk 2 orang.",
+                impact4_title: "Kerusakan Ekosistem", impact4_desc: "Hilangnya habitat mengancam keanekaragaman hayati lokal. Pohon menjadi rumah bagi ratusan spesies serangga, burung, dan mikroorganisme penting.",
+                impact5_title: "Rising Sea Level", impact5_desc: "Sebagai kota pesisir, Lhokseumawe rentan terhadap naiknya permukaan laut. Mangrove dan vegetasi pesisir menjadi benteng alami pertahanan pertama.",
+                impact6_title: "Kesehatan Masyarakat", impact6_desc: "Paparan polusi dan panas meningkatkan penyakit pernapasan dan heatstroke. Ruang hijau terbukti menurunkan stres dan meningkatkan kesehatan mental warga.",
+                footer_brand: "Sejuta Pohon",
+                footer_city: "Lhokseumawe 2026",
+                footer_desc: "Program penanaman satu juta pohon untuk menyelamatkan iklim dan masa depan Kota Lhokseumawe, Aceh.",
+                footer_contact_title: "Kontak",
+                footer_address: "Kota Lhokseumawe, Aceh",
+                footer_nav_title: "Navigasi",
+                footer_nav_tentang: "Tentang Program",
+                footer_nav_dampak: "Dampak Perubahan Iklim",
+                footer_nav_manfaat: "Manfaat Jangka Panjang",
+                footer_nav_form: "Formulir Pendaftaran",
+                copyright: " 2026 Gerakan Menanam Sejuta Pohon Kota Lhokseumawe.",
+                footer_tagline: '"Menanam Hari Ini, Bernafas Esok Hari."',
+                didyouknow_title: "Tahukah Anda?",
+                fact_1: "1 hektar hutan menyerap CO₂ setara mobil dikendarai 40.000 km",
+                fact_2: "Pohon beringin bisa menyerap 500 liter air per hari",
+                fact_3: "Hutan kota bisa menurunkan suhu udara hingga 8°C",
+            },
+            en: {
+                brand_name: "ONE MILLION TREES", brand_city: "Lhokseumawe",
+                nav_tentang: "About", nav_dampak: "Impact", nav_manfaat: "Benefits", nav_daftar: "Register Now",
+                hero_badge: "Active Program 2026", hero_line1: "Planting", hero_line2: "One Million Trees", hero_line3: "Lhokseumawe City",
+                hero_desc: "A collective movement to save the earth from the climate crisis, one tree at a time. Let's make Lhokseumawe greener and more sustainable.",
+                hero_cta: "Register as Volunteer", hero_cta2: "Learn More",
+                stat_trees: "Target Trees", stat_volunteers: "Target Volunteers", stat_kecamatan: "Districts", stat_co2: "CO₂ Absorbed/Year",
+                tentang_label: "About Program", tentang_title: 'What is the <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">One Million Trees</span> Movement?',
+                tentang_p1: "The One Million Trees Movement is an environmental program initiated to re-green Lhokseumawe City, Aceh. Through collaboration between government, communities, organizations, and the private sector, this program aims to plant one million trees in the coming years.",
+                tentang_p2: "This program is not just about planting — it's about building environmental awareness among the younger generation, creating quality green open spaces, and making real contributions to reducing carbon emissions at the local level.",
+                tentang_p3: "Every tree planted is an investment for our children's future. From street shade trees to urban forests, every contribution you make matters greatly.",
+                form_label: "Join Us", form_title: 'Be Part of <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Change</span>',
+                form_nama: "Full Name *", form_wa: "WhatsApp *", form_email: "Email", form_usia: "Age *", form_alamat: "Address *",
+                form_motivasi: "Motivation to join", form_motivasi_desc: "Tell us why you want to plant trees and how you want to contribute to this movement.",
+                form_pekerjaan: "Occupation *", form_pekerjaan_placeholder: "Select occupation",
+                job_student: "Student", job_civil: "Civil Servant", job_private: "Private", job_teacher: "Teacher / Lecturer", job_entrepreneur: "Entrepreneur", job_other: "Other",
+                form_jumlah: "Target Trees *", form_jumlah_placeholder: "Select quantity",
+                form_submit: "Register as Volunteer",
+                progress_title: "Registration Progress", progress_target: "out of 10,000 volunteers target",
+                datatable_title: "Registered Participants", empty_table: "No participant data yet",
+                th_no: "No", th_nama: "Name", th_pekerjaan: "Occupation", th_pohon: "Trees", th_motivasi: "Motivation", th_tanggal: "Date",
+                copyright: " 2026 One Million Trees Movement Lhokseumawe.",
+                toast_success_title: "Success!", toast_error_title: "Attention",
+                err_fill_required: "Please fill all required fields.",
+                err_wa_format: "Invalid WhatsApp format. Use 08xxx.",
+                sending: "Sending...", success_db: ", data saved to Database.",
+                success_no_db: ", you are registered.",
+                err_connect: "Failed to connect to Database.",
+                alur_label: "Join Flow",
+                alur_title: 'Journey to Become a <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Green Hero</span>',
+                alur_desc: "Simple process. Register, Plant, and Get rewarded for your contribution to the earth.",
+                step1_title: "Fill Form", step1_desc: "Complete your personal data through the registration form on this page.",
+                step2_title: "Admin Verification", step2_desc: "Our team will contact your WhatsApp for data confirmation.",
+                step3_title: "Get Saplings", step3_desc: "Come to the nearest gathering point to pick up tree saplings.",
+                step4_title: "Plant Trees", step4_desc: "Perform planting at the mutually agreed location.",
+                step5_title: "Report Proof", step5_desc: "Send photo documentation of the planting to admin WhatsApp.",
+                step6_title: "Get Certificate", step6_desc: "Receive a digital volunteer certificate as a token of appreciation.",
+
+                // Tambahkan di dalam object en: { ... }
+                dampak_label: "Why This Matters",
+                dampak_title: 'Climate Change <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-400">Impact</span>',
+                dampak_desc: "Lhokseumawe faces real climate challenges. Without action, the impacts will only worsen for the community.",
+                impact1_title: "Rising Temperatures", impact1_desc: "Average temperatures in Lhokseumawe have risen 0.5°C per decade. Urban forests can lower local temperatures by up to 8°C through evapotranspiration and canopy shading.",
+                impact2_title: "Flooding & Erosion", impact2_desc: "Deforestation increases surface runoff and soil erosion. Tree roots absorb up to 70% more rainwater, significantly reducing flood risks.",
+                impact3_title: "Air Quality", impact3_desc: "Urban air pollutants increase with urbanization. One mature tree can filter 22 kg of pollutants per year and produce enough oxygen for 2 people.",
+                impact4_title: "Ecosystem Damage", impact4_desc: "Habitat loss threatens local biodiversity. Trees become home to hundreds of species of insects, birds, and important microorganisms.",
+                impact5_title: "Rising Sea Level", impact5_desc: "As a coastal city, Lhokseumawe is vulnerable to sea level rise. Mangroves and coastal vegetation serve as the first natural defense line.",
+                impact6_title: "Public Health", impact6_desc: "Exposure to pollution and heat increases respiratory diseases and heatstroke. Green spaces are proven to reduce stress and improve residents' mental health.",
+
+                footer_brand: "One Million Trees",
+                footer_city: "Lhokseumawe 2026",
+                footer_desc: "One million tree planting program to save the climate and future of Lhokseumawe City, Aceh.",
+                footer_contact_title: "Contact",
+                footer_address: "Lhokseumawe City, Aceh",
+                footer_nav_title: "Navigation",
+                footer_nav_tentang: "About the Program",
+                footer_nav_dampak: "Climate Change Impact",
+                footer_nav_manfaat: "Long-term Benefits",
+                footer_nav_form: "Registration Form",
+                copyright: " 2026 One Million Trees Movement Lhokseumawe.",
+                footer_tagline: '"Plant Today, Breathe Tomorrow."',
+                
+
+            didyouknow_title: "Did You Know?",
+            fact_1: "1 hectare of forest absorbs CO₂ equivalent to a car driven 40,000 km",
+            fact_2: "A banyan tree can absorb 500 liters of water per day",
+            fact_3: "Urban forests can lower air temperature by up to 8°C",
+
+            // Tambahkan ini di dalam blok 'en'
+            alur_label: "Join Flow",
+            alur_title: 'Journey to Become a <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest-400 to-emerald-300">Green Hero</span>',
+            alur_desc: "Simple process. Register, Plant, and Get rewarded for your contribution to the earth.",
+            step1_title: "Fill Form", step1_desc: "Complete your personal data through the registration form on this page.",
+            step2_title: "Admin Verification", step2_desc: "Our team will contact your WhatsApp for data confirmation.",
+            step3_title: "Get Saplings", step3_desc: "Come to the nearest gathering point to pick up tree saplings.",
+            step4_title: "Plant Trees", step4_desc: "Perform planting at the mutually agreed location.",
+            step5_title: "Report Proof", step5_desc: "Send photo documentation of the planting to admin WhatsApp.",
+            step6_title: "Get Certificate", step6_desc: "Receive a digital volunteer certificate as a token of appreciation.",
+            }
+        },
+        init() {
+            const saved = localStorage.getItem('preferred_lang');
+            if (saved && this.dictionary[saved]) this.set(saved);
+            else this.set('id');
+            
+            // Dropdown Logic
+            document.getElementById('lang-toggle').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('lang-dropdown').classList.toggle('opacity-100');
+                document.getElementById('lang-dropdown').classList.toggle('translate-y-0');
+                document.getElementById('lang-dropdown').classList.toggle('pointer-events-auto');
+            });
+            document.addEventListener('click', () => {
+                const dd = document.getElementById('lang-dropdown');
+                dd.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            });
+        },
+        set(lang) {
+            this.current = lang;
+            localStorage.setItem('preferred_lang', lang);
+            document.documentElement.lang = lang;
+            document.getElementById('lang-label').innerText = lang.toUpperCase();
+            
+            // Update Text Content
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (this.dictionary[lang][key]) {
+                    if (el.tagName === 'OPTION') el.text = this.dictionary[lang][key];
+                    else el.innerHTML = this.dictionary[lang][key];
+                }
+            });
+            
+            // Update Mobile UI
+            document.getElementById('mob-lang-id').classList.toggle('opacity-100', lang === 'id');
+            document.getElementById('mob-lang-id').classList.toggle('opacity-50', lang !== 'id');
+            document.getElementById('mob-lang-en').classList.toggle('opacity-100', lang === 'en');
+            document.getElementById('mob-lang-en').classList.toggle('opacity-50', lang !== 'en');
+            
+            // Refresh Icons
+            lucide.createIcons();
+            App.UI.renderTable();
+        },
+        get(key) {
+            return this.dictionary[this.current][key] || key;
+        }
+    },
+
+    // --- 3. UTILITIES ---
+    Utils: {
+        escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); },
+        normalizeWA(raw) {
+            if (!raw) return '';
+            let wa = String(raw).trim().replace(/[\s.-]/g, '');
+            if (wa.startsWith('+62')) wa = '0' + wa.slice(3);
+            if (wa.startsWith('62')) wa = '0' + wa.slice(2);
+            return wa.startsWith('8') ? '0' + wa : wa;
+        },
+        formatDate(date) {
+            return new Date(date).toLocaleDateString(this.current === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+    },
+
+    // --- 4. DATA MANAGEMENT (Storage & API) ---
+    Data: {
+        _apiBase: '',
+        getApiBase() {
+            if (!this._apiBase) {
+                this._apiBase = App.Config.API_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : '');
+            }
+            return this._apiBase;
+        },
+        async api(endpoint, options = {}) {
+            const base = this.getApiBase();
+            const url = base ? `${base}/api/${endpoint}` : `/api/${endpoint}`;
+            const res = await fetch(url, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+            if (!res.ok) throw new Error(`API Error: ${res.status}`);
+            return res.json();
+        },
+        getAll() {
+            return JSON.parse(localStorage.getItem(App.Config.STORAGE_KEY) || '[]');
+        },
+        save(data) {
+            localStorage.setItem(App.Config.STORAGE_KEY, JSON.stringify(data));
+        },
+        add(entry) {
+            const data = this.getAll();
+            data.unshift(entry);
+            this.save(data);
+        },
+        async remove(index) {
+            const data = this.getAll();
+            const entry = data[index];
+            if (entry && entry.id) {
+                try { await this.api(`peserta/${entry.id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+            }
+            data.splice(index, 1);
+            this.save(data);
+        },
+        clear() {
+            this.save([]);
+        },
+        async sendToDB(data) {
+            try {
+                await this.api('peserta', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                return true;
+            } catch (e) { 
+                console.error('Error sending to DB:', e);
+                return false; 
+            }
+        },
+        async sync() {
+            try {
+                const remote = await this.api('peserta');
+                if (!Array.isArray(remote)) throw new Error("Invalid Format");
+                
+                const normalized = remote.map(r => ({
+                    id: r.id,
+                    nama: r.nama, 
+                    wa: r.whatsapp, 
+                    whatsapp: r.whatsapp,
+                    email: r.email,
+                    usia: r.usia,
+                    pekerjaan: r.pekerjaan, 
+                    alamat: r.alamat,
+                    jumlah_pohon: r.jumlah_pohon || r.jumlah || 1,
+                    motivasi: r.motivasi || "Dari Database Server",
+                    tanggal: new Date(r.created_at || r.timestamp).toLocaleDateString('id-ID'),
+                    timestamp: r.created_at || r.timestamp
+                })).filter(r => r.nama);
+                
+                this.save(normalized);
+                App.UI.renderTable();
+                return true;
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
+        },
+    },
+
+    // --- 6. UI MANAGER ---
+    UI: {
+        pagination: { currentPage: 1, rowsPerPage: 10, totalPages: 1 },
+        
+        init() {
+            // --- 1. Theme Logic ---
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            this.applyTheme(savedTheme);
+            
+            // --- 2. SMOOTH SCROLL (Kode Perbaikan) ---
+            // Kode ini membuat perpindahan halaman menjadi halus saat menu diklik
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetEl = document.querySelector(targetId);
+                    
+                    if (targetEl) {
+                        // Tutup menu mobile jika sedang terbuka
+                        const mobileMenu = document.getElementById('mobile-menu');
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                        }
+
+                        // Lakukan Smooth Scroll
+                        targetEl.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // --- 3. Scroll Effects (Navbar Blur) ---
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                if (window.scrollY > 50) nav.classList.add('nav-scrolled');
+                else nav.classList.remove('nav-scrolled');
+            });
+            
+            // --- 4. Form Submit ---
+            document.getElementById('registration-form').addEventListener('submit', (e) => this.handleFormSubmit(e));
+            
+            // --- 5. Init Effects ---
+            App.Effects.initLeaves();
+            App.Effects.initScrollReveal();
+            
+            // --- 6. Initial Render & Sync ---
+            this.renderTable();
+            App.Data.sync();
+        },
+        toggleTheme() {
+            const current = localStorage.getItem('theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            this.applyTheme(next);
+            localStorage.setItem('theme', next);
+        },
+        applyTheme(theme) {
+            const html = document.documentElement;
+            const mobIcon = document.getElementById('mobile-theme-icon');
+            const deskIcon = document.getElementById('desktop-theme-btn');
+            
+            if (theme === 'light') {
+                html.classList.add('light-mode');
+                if (mobIcon) mobIcon.setAttribute('data-lucide', 'sun');
+                if (deskIcon) deskIcon.setAttribute('data-lucide', 'moon');
+            } else {
+                html.classList.remove('light-mode');
+                if (mobIcon) mobIcon.setAttribute('data-lucide', 'moon');
+                if (deskIcon) deskIcon.setAttribute('data-lucide', 'sun');
+            }
+            lucide.createIcons();
+        },
+        toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        },
+        showToast(titleKey, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = App.I18n.get(titleKey);
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        },
+        hideToast() {
+            document.getElementById('toast').classList.remove('show');
+        },
+        closeModal(e) {
+            if (e.target.id === 'modal-overlay') document.getElementById('modal-overlay').classList.remove('active');
+        },
+        closeModalDirect() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        },
+        async handleFormSubmit(e) {
+            e.preventDefault();
+            const nama = document.getElementById('f-nama').value.trim();
+            const whatsapp = App.Utils.normalizeWA(document.getElementById('f-wa').value);
+            const email = document.getElementById('f-email').value.trim();
+            const usia = document.getElementById('f-usia').value;
+            const pekerjaan = document.getElementById('f-pekerjaan').value;
+            const alamat = document.getElementById('f-alamat').value;
+            const jumlah_pohon = document.getElementById('f-jumlah').value;
+            const motivasi = document.getElementById('f-motivasi').value.trim();
+
+        if (!nama || !whatsapp || !usia || !pekerjaan || !jumlah_pohon || !motivasi) {
+            return this.showToast('toast_error_title', App.I18n.get('err_fill_required'));
+        }
+        if (!/^08\d{8,12}$/.test(whatsapp)) {
+            return this.showToast('toast_error_title', App.I18n.get('err_wa_format'));
+        }
+
+        const btn = document.getElementById('submit-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 sync-spinner"></i> ${App.I18n.get('sending')}`;
+        btn.disabled = true;
+        lucide.createIcons();
+
+        const entry = { 
+            nama, 
+            whatsapp, 
+            email: email || null,
+            usia, 
+            pekerjaan, 
+            alamat, 
+            jumlah_pohon, 
+            motivasi,
+            tanggal: App.Utils.formatDate(new Date()) 
+        };
+
+        // 1. Kirim ke Database
+        let dbResult = false;
+        try {
+            dbResult = await App.Data.sendToDB(entry);
+            if (dbResult && dbResult.id) entry.id = dbResult.id;
+        } catch (error) {
+            console.error("Gagal sinkronisasi:", error);
+        }
+
+        // 2. Simpan & Render Lokal
+        App.Data.add(entry);
+
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        lucide.createIcons();
+        e.target.reset();
+
+        this.showToast('toast_success_title', `${nama} ${dbResult ? App.I18n.get('success_db') : App.I18n.get('success_no_db')}`);
+        },
+        
+        // --- Fitur Baru: Buka Detail Modal (Floating Page) ---
+        openDetail(index) {
+            const data = App.Data.getAll();
+            const d = data[index];
+            if (!d) return;
+
+            const modal = document.getElementById('detail-modal');
+            const body = document.getElementById('detail-body');
+            const initials = (d.nama || 'NA').split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+
+            body.innerHTML = `
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 rounded-2xl bg-forest-700/30 flex items-center justify-center text-2xl font-bold text-forest-300 light-mode:bg-green-100 light-mode:text-green-800 shadow-sm">
+                        ${initials}
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-forest-100 light-mode:text-forest-900">${App.Utils.escapeHtml(d.nama)}</h3>
+                        <p class="text-sm text-forest-400 light-mode:text-forest-600">${App.Utils.escapeHtml(d.pekerjaan)}</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-forest-800/30 p-3 rounded-xl border border-forest-700/30 light-mode:bg-green-50 light-mode:border-green-200">
+                        <span class="text-[10px] uppercase font-bold text-forest-500 tracking-wider block mb-1">Target Pohon</span>
+                        <span class="text-lg font-bold text-forest-200 light-mode:text-forest-800">${d.jumlah_pohon || d.jumlah || 0} Pohon</span>
+                    </div>
+                    <div class="bg-forest-800/30 p-3 rounded-xl border border-forest-700/30 light-mode:bg-green-50 light-mode:border-green-200">
+                        <span class="text-[10px] uppercase font-bold text-forest-500 tracking-wider block mb-1">Tanggal Daftar</span>
+                        <span class="text-lg font-bold text-forest-200 light-mode:text-forest-800">${d.tanggal}</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-forest-800/30 p-3 rounded-xl border border-forest-700/30 light-mode:bg-green-50 light-mode:border-green-200">
+                        <span class="text-[10px] uppercase font-bold text-forest-500 tracking-wider block mb-1">WhatsApp</span>
+                        <span class="text-sm font-semibold text-forest-200 light-mode:text-forest-800">${App.Utils.escapeHtml(d.whatsapp || d.wa || '-')}</span>
+                    </div>
+                    <div class="bg-forest-800/30 p-3 rounded-xl border border-forest-700/30 light-mode:bg-green-50 light-mode:border-green-200">
+                        <span class="text-[10px] uppercase font-bold text-forest-500 tracking-wider block mb-1">Email</span>
+                        <span class="text-sm font-semibold text-forest-200 light-mode:text-forest-800">${App.Utils.escapeHtml(d.email || '-')}</span>
+                    </div>
+                </div>
+
+                <div class="bg-forest-800/30 p-3 rounded-xl border border-forest-700/30 mb-6 light-mode:bg-green-50 light-mode:border-green-200">
+                    <span class="text-[10px] uppercase font-bold text-forest-500 tracking-wider block mb-1">Alamat</span>
+                    <span class="text-sm text-forest-200 light-mode:text-forest-800">${App.Utils.escapeHtml(d.alamat || '-')}</span>
+                </div>
+
+                <div>
+                    <span class="text-xs font-bold text-forest-500 uppercase tracking-wider block mb-2">Motivasi</span>
+                    <div class="p-4 bg-forest-950/50 border-l-4 border-forest-500 rounded-r-xl text-forest-300 italic leading-relaxed light-mode:bg-white light-mode:border-green-500 light-mode:text-forest-700 shadow-inner">
+                        "${App.Utils.escapeHtml(d.motivasi || 'Tidak ada motivasi.')}"
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.modal-content').classList.remove('scale-95');
+                modal.querySelector('.modal-content').classList.add('scale-100');
+            }, 10);
+        },
+
+        renderTable() {
+            const data = App.Data.getAll();
+            const tbody = document.getElementById('data-table-body');
+            
+            // Update Stats
+            document.getElementById('total-registrants').innerText = data.length;
+            const totalTrees = data.reduce((sum, item) => sum + (parseInt(item.jumlah_pohon || item.jumlah) || 0), 0);
+            const pct = Math.min((data.length / 10000) * 100, 100);
+            document.getElementById('progress-pct').innerText = pct + '%';
+            document.getElementById('progress-ring').style.strokeDashoffset = 213.6 - (213.6 * pct / 100);
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-12 text-center text-forest-600 light-mode:text-forest-400"><div class="inline-flex items-center justify-center w-10 h-10 mb-3 rounded-full bg-forest-900 light-mode:bg-green-50"><i data-lucide="inbox" class="w-5 h-5 opacity-30"></i></div><p class="text-sm">${App.I18n.get('empty_table')}</p></td></tr>`;
+                lucide.createIcons();
+                return;
+            }
+            
+            // Calculate pagination
+            const { currentPage, rowsPerPage } = this.pagination;
+            this.pagination.totalPages = Math.ceil(data.length / rowsPerPage);
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedData = data.slice(start, end);
+            
+            // Adjust current page if out of bounds
+            if (currentPage > this.pagination.totalPages) {
+                this.pagination.currentPage = this.pagination.totalPages;
+                return this.renderTable();
+            }
+
+            tbody.innerHTML = paginatedData.map((d, i) => `
+            <tr onclick="App.UI.openDetail(${start + i})" class="border-t border-forest-800/20 hover:bg-forest-900/20 transition-colors cursor-pointer light-mode:hover:bg-green-50">
+            <td class="px-5 py-3 text-forest-500 text-xs light-mode:text-forest-500">${start + i + 1}</td>
+            <td class="px-5 py-3 text-forest-200 font-medium light-mode:text-forest-800">${App.Utils.escapeHtml(d.nama)}</td>
+            <td class="px-5 py-3 text-forest-400 text-xs light-mode:text-forest-600">${App.Utils.escapeHtml(d.pekerjaan)}</td>
+            <td class="px-5 py-3"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-forest-700/20 text-forest-300 text-xs font-semibold light-mode:bg-green-100 light-mode:text-green-700">${d.jumlah_pohon || d.jumlah || 0}</span></td>
+            
+            <td class="px-5 py-3 text-forest-500 text-xs light-mode:text-forest-500 max-w-[150px] truncate" title="${d.motivasi || ''}">
+                ${d.motivasi || '-'}
+            </td>
+            
+            <td class="px-5 py-3 text-forest-500 text-xs light-mode:text-forest-500">${d.tanggal}</td>
+            </tr>
+    `       ).join('');
+            
+            this.updatePaginationControls();
+            lucide.createIcons();
+        },
+
+        changeRowsPerPage(value) {
+            this.pagination.rowsPerPage = parseInt(value);
+            this.pagination.currentPage = 1;
+            this.renderTable();
+        },
+        
+        changePage(page) {
+            this.pagination.currentPage = page;
+            this.renderTable();
+        },
+        
+        updatePaginationControls() {
+            const { currentPage, totalPages } = this.pagination;
+            const container = document.getElementById('pagination-controls');
+            if (!container) return;
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `
+                <button onclick="App.UI.changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+                    class="px-3 py-1 rounded-lg bg-forest-800/50 text-forest-300 hover:bg-forest-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `
+                        <button onclick="App.UI.changePage(${i})" 
+                            class="px-3 py-1 rounded-lg text-sm ${i === currentPage ? 'bg-forest-600 text-white' : 'bg-forest-800/50 text-forest-300 hover:bg-forest-700'}">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += `<span class="text-forest-500 px-1">...</span>`;
+                }
+            }
+            
+            html += `
+                <button onclick="App.UI.changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+                    class="px-3 py-1 rounded-lg bg-forest-800/50 text-forest-300 hover:bg-forest-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+            `;
+            
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+    },
+
+    // --- 7. ANIMATION EFFECTS ---
+    Effects: {
+        initLeaves() {
+            const container = document.getElementById('leaves-container');
+            const svg = `<svg viewBox="0 0 40 40" fill="none"><path d="M20 5 C10 10 5 20 10 30 C15 35 25 35 30 30 C35 20 30 10 20 5Z" fill="rgba(34,197,94,0.4)"/></svg>`;
+            for (let i = 0; i < 8; i++) {
+                const el = document.createElement('div');
+                el.className = 'leaf';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.animationDuration = (10 + Math.random() * 20) + 's';
+                el.style.animationDelay = (Math.random() * 5) + 's';
+                el.innerHTML = svg;
+                container.appendChild(el);
+            }
+        },
+        initScrollReveal() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Count up effect logic
+                        entry.target.querySelectorAll('.count-up').forEach(el => {
+                            const target = parseInt(el.getAttribute('data-target'));
+                            if (target && !el.dataset.done) {
+                                el.dataset.done = 'true';
+                                let curr = 0;
+                                const step = Math.ceil(target / 50);
+                                const timer = setInterval(() => {
+                                    curr += step;
+                                    if (curr >= target) { curr = target; clearInterval(timer); }
+                                    el.innerText = curr.toLocaleString(App.I18n.current === 'id' ? 'id-ID' : 'en-US');
+                                }, 30);
+                            }
+                        });
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+        }
+    }
+};
+
+// --- Global Close Detail Function (Dipanggil dari HTML) ---
+window.closeDetail = function() {
+    const modal = document.getElementById('detail-modal');
+    modal.classList.add('opacity-0');
+    modal.querySelector('.modal-content').classList.remove('scale-100');
+    modal.querySelector('.modal-content').classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+
+// --- COMMENTS MODULE ---
+App.Comments = {
+    verifiedUser: null,
+    replyTo: null,
+    sortBy: 'newest',
+    comments: [],
+    
+    init() {
+        // Check session storage for verified user
+        const saved = sessionStorage.getItem('sp_comment_user');
+        if (saved) {
+            try {
+                this.verifiedUser = JSON.parse(saved);
+                this.showCommentForm();
+                this.renderComments(); // Re-render comments when auto-login from session storage
+            } catch (e) { console.error(e); }
+        }
+        this.loadComments();
+    },
+    
+    async verifyParticipant() {
+        const nama = document.getElementById('verify-nama').value.trim();
+        const whatsapp = document.getElementById('verify-whatsapp').value.trim();
+        const errorEl = document.getElementById('verify-error');
+        
+        if (!nama || !whatsapp) {
+            errorEl.textContent = 'Nama dan WhatsApp wajib diisi';
+            errorEl.classList.remove('hidden');
+            return;
+        }
+        
+        try {
+            // Verifikasi via API
+            const result = await App.Data.api('verify', {
+                method: 'POST',
+                body: JSON.stringify({ nama, whatsapp })
+            });
+            
+            if (result.success) {
+                this.verifiedUser = result.user;
+                sessionStorage.setItem('sp_comment_user', JSON.stringify(this.verifiedUser));
+                this.showCommentForm();
+                this.renderComments(); // Re-render to show reply buttons
+                errorEl.classList.add('hidden');
+                App.UI.showToast('Verifikasi berhasil', 'Silakan berkomentar');
+            } else {
+                errorEl.textContent = result.error || 'Data tidak ditemukan. Pastikan nama dan nomor WhatsApp sudah terdaftar sebagai peserta.';
+                errorEl.classList.remove('hidden');
+            }
+        } catch (err) {
+            console.error('Verify error:', err);
+            errorEl.textContent = 'Gagal verifikasi. Coba lagi nanti.';
+            errorEl.classList.remove('hidden');
+        }
+    },
+    
+    showCommentForm() {
+        document.getElementById('comment-verify-section').classList.add('hidden');
+        document.getElementById('comment-form-section').classList.remove('hidden');
+        
+        // Set user info
+        const nama = this.verifiedUser.nama;
+        document.getElementById('comment-username').textContent = nama;
+        document.getElementById('comment-avatar').textContent = nama.charAt(0).toUpperCase();
+    },
+    
+    logout() {
+        this.verifiedUser = null;
+        sessionStorage.removeItem('sp_comment_user');
+        document.getElementById('comment-verify-section').classList.remove('hidden');
+        document.getElementById('comment-form-section').classList.add('hidden');
+        document.getElementById('verify-nama').value = '';
+        document.getElementById('verify-whatsapp').value = '';
+    },
+    
+    async loadComments() {
+        try {
+            const result = await App.Data.api('komentar');
+            this.comments = this.buildThread(result || []);
+            this.renderComments();
+        } catch (err) {
+            console.error('Load comments error:', err);
+        }
+    },
+    
+    buildThread(flatComments) {
+        const map = new Map();
+        const roots = [];
+        
+        // First pass: create map with empty replies
+        flatComments.forEach(c => {
+            map.set(c.id, { ...c, replies: [] });
+        });
+        
+        // Second pass: build hierarchy
+        flatComments.forEach(c => {
+            if (c.parent_id && map.has(c.parent_id)) {
+                map.get(c.parent_id).replies.push(map.get(c.id));
+            } else {
+                roots.push(map.get(c.id));
+            }
+        });
+        
+        // Sort roots based on sortBy
+        if (this.sortBy === 'newest') {
+            roots.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else if (this.sortBy === 'oldest') {
+            roots.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        } else if (this.sortBy === 'popular') {
+            roots.sort((a, b) => (b.suka || 0) - (a.suka || 0));
+        }
+        
+        return roots;
+    },
+    
+    renderComments() {
+        const container = document.getElementById('comments-list');
+        if (!this.comments.length) {
+            container.innerHTML = `
+                <div class="text-center py-12 text-forest-500">
+                    <i data-lucide="message-square" class="w-12 h-12 mx-auto mb-4 opacity-30"></i>
+                    <p data-i18n="comments_empty">Belum ada komentar. Jadilah yang pertama berdiskusi!</p>
+                </div>`;
+            lucide.createIcons();
+            return;
+        }
+        
+        container.innerHTML = this.comments.map(c => this.renderCommentItem(c)).join('');
+        lucide.createIcons();
+    },
+    
+    renderCommentItem(c, isReply = false) {
+        const initials = c.nama ? c.nama.charAt(0).toUpperCase() : '?';
+        const date = new Date(c.created_at).toLocaleDateString('id-ID', { 
+            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+        });
+        const isLiked = this.isLiked(c.id);
+        
+        let html = `
+            <div class="${isReply ? 'comment-reply' : 'comment-item'}">
+                <div class="flex gap-3">
+                    <div class="comment-avatar">${initials}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-semibold text-forest-200 text-sm light-mode:text-forest-800">${this.escapeHtml(c.nama)}</span>
+                            ${c.peserta_id ? `<span class="verified-badge"><i data-lucide="check-circle-2" class="w-3 h-3"></i>Peserta</span>` : ''}
+                            <span class="text-xs text-forest-500">${date}</span>
+                        </div>
+                        <p class="text-forest-300 text-sm leading-relaxed light-mode:text-forest-700">${this.escapeHtml(c.isi)}</p>
+                        
+                        <div class="comment-actions">
+                            <button class="comment-action-btn ${isLiked ? 'liked' : ''}" onclick="App.Comments.toggleLike(${c.id})">
+                                <i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-current' : ''}"></i>
+                                <span>${c.suka || 0}</span>
+                            </button>
+                            ${this.verifiedUser ? `
+                            <button class="comment-action-btn" onclick="App.Comments.startReply(${c.id})">
+                                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                <span>Balas</span>
+                            </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+        `;
+        
+        // Render replies recursively
+        if (c.replies && c.replies.length) {
+            c.replies.forEach(reply => {
+                html += this.renderCommentItem(reply, true);
+            });
+        }
+        
+        html += '</div>';
+        return html;
+    },
+    
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+    
+    isLiked(commentId) {
+        const liked = JSON.parse(localStorage.getItem('sp_liked_comments') || '[]');
+        return liked.includes(commentId);
+    },
+    
+    async toggleLike(commentId) {
+        const liked = JSON.parse(localStorage.getItem('sp_liked_comments') || '[]');
+        const isLiked = liked.includes(commentId);
+        
+        try {
+            await App.Data.api(`komentar?id=${commentId}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ action: 'like' })
+            });
+            
+            // Update local tracking
+            if (isLiked) {
+                const idx = liked.indexOf(commentId);
+                if (idx > -1) liked.splice(idx, 1);
+            } else {
+                liked.push(commentId);
+            }
+            localStorage.setItem('sp_liked_comments', JSON.stringify(liked));
+            
+            // Reload comments
+            this.loadComments();
+        } catch (err) {
+            console.error('Like error:', err);
+        }
+    },
+    
+    startReply(commentId) {
+        // Find comment name from flat data
+        let nama = 'Komentar';
+        const findName = (comments) => {
+            for (const c of comments) {
+                if (c.id === commentId) return c.nama;
+                if (c.replies?.length) {
+                    const found = findName(c.replies);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+        const found = findName(this.comments);
+        if (found) nama = found;
+        
+        this.replyTo = commentId;
+        document.getElementById('reply-indicator').classList.remove('hidden');
+        document.getElementById('reply-to-name').textContent = nama;
+        document.getElementById('comment-input').focus();
+    },
+    
+    cancelReply() {
+        this.replyTo = null;
+        document.getElementById('reply-indicator').classList.add('hidden');
+    },
+    
+    async submitComment() {
+        const input = document.getElementById('comment-input');
+        const isi = input.value.trim();
+
+        if (!isi) {
+            App.UI.showToast('Komentar kosong', 'Tulis sesuatu terlebih dahulu', true);
+            return;
+        }
+
+        if (!this.verifiedUser) {
+            App.UI.showToast('Belum terverifikasi', 'Silakan verifikasi terlebih dahulu', true);
+            return;
+        }
+
+        try {
+            await App.Data.api('komentar', {
+                method: 'POST',
+                body: JSON.stringify({
+                    nama: this.verifiedUser.nama,
+                    whatsapp: this.verifiedUser.whatsapp,
+                    isi: isi,
+                    parent_id: this.replyTo
+                })
+            });
+
+            input.value = '';
+            this.cancelReply();
+            App.UI.showToast('Komentar terkirim', 'Terima kasih atas partisipasi Anda');
+            this.loadComments();
+        } catch (err) {
+            console.error('Submit comment error:', err);
+            App.UI.showToast('Gagal mengirim', 'Coba lagi nanti', true);
+        }
+    },
+    
+    setSort(sortBy) {
+        this.sortBy = sortBy;
+        
+        // Update UI tabs
+        document.querySelectorAll('.sort-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Re-sort and render
+        this.comments = this.buildThread(this.comments);
+        this.renderComments();
+    }
+};
+
+// --- Expose App globally for onclick handlers ---
+window.App = App;
+
+// --- START APPLICATION ---
+App.I18n.init();
+App.UI.init();
+App.Comments.init();
+</script>
+
+</body>
+</html>
