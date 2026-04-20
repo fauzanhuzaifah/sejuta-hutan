@@ -10,9 +10,5 @@
             "src": "/api/(.*)",
             "dest": "/api/$1.js"
         }
-    ],
-    "env": {
-        "TURSO_URL": "@turso-url",
-        "TURSO_TOKEN": "@turso-token"
-    }
+    ]
 }
