@@ -1300,7 +1300,7 @@ const App = {
             // Refresh Icons
             lucide.createIcons();
             const savedTheme = localStorage.getItem('theme') || 'dark';
-            this.applyTheme(savedTheme);
+            App.UI.applyTheme(savedTheme);
             App.UI.renderTable();
         },
         get(key) {
