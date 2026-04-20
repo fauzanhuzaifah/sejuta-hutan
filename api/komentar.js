@@ -62,12 +62,24 @@ export default async function handler(request) {
 
         if (request.method === 'POST') {
             const body = await request.json();
-            const { nama, whatsapp, isi, parent_id, peserta_id } = body;
+            const { nama, whatsapp, isi, parent_id } = body;
+            
+            // Look up participant to get peserta_id
+            let pesertaId = null;
+            const normalizedWa = whatsapp.startsWith('0') ? whatsapp.substring(1) : whatsapp;
+            const participants = await tursoQuery(
+                'SELECT id FROM peserta WHERE nama = ? AND (whatsapp = ? OR whatsapp = ?)',
+                [nama, normalizedWa, whatsapp]
+            );
+            
+            if (participants.length > 0) {
+                pesertaId = participants[0].id;
+            }
             
             await tursoQuery(
                 `INSERT INTO komentar (nama, whatsapp, isi, parent_id, peserta_id, suka, created_at) 
                  VALUES (?, ?, ?, ?, ?, 0, datetime('now'))`,
-                [nama, whatsapp, isi, parent_id || null, peserta_id || null]
+                [nama, whatsapp, isi, parent_id || null, pesertaId]
             );
             
             return new Response(JSON.stringify({ success: true, message: 'Komentar berhasil dikirim' }), { status: 200, headers });
