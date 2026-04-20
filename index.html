@@ -2145,12 +2145,7 @@ App.Comments = {
             this.loadComments();
         } catch (err) {
             console.error('Submit comment error:', err);
-            // Check if error is 403 (not a registered participant)
-            if (err.message && err.message.includes('Hanya peserta yang sudah mendaftar')) {
-                App.UI.showToast('Akses Ditolak', 'Hanya peserta yang sudah mendaftar dapat memberikan komentar', true);
-            } else {
-                App.UI.showToast('Gagal mengirim', 'Coba lagi nanti', true);
-            }
+            App.UI.showToast('Gagal mengirim', 'Coba lagi nanti', true);
         }
     },
     
