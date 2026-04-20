@@ -1104,7 +1104,7 @@
 const App = {
     // --- 1. CONFIGURATION ---
     Config: {
-        API_URL: '', // Empty = same origin, or 'https://your-app.vercel.app'
+        API_URL: 'http://localhost:3000/api', // Empty = same origin, or 'https://your-app.vercel.app'
         ADMIN_PASS: 'sejutapohon2025', // Password Admin
         STORAGE_KEY: 'sejutaPohon_Lhokseumawe',
         SESSION_KEY: 'sp_admin_auth',
@@ -1299,6 +1299,8 @@ const App = {
             
             // Refresh Icons
             lucide.createIcons();
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            this.applyTheme(savedTheme);
             App.UI.renderTable();
         },
         get(key) {
@@ -1526,13 +1528,18 @@ const App = {
             
             if (theme === 'light') {
                 html.classList.add('light-mode');
-                if (mobIcon) mobIcon.setAttribute('data-lucide', 'sun');
+                html.classList.remove('dark');
+                if (mobIcon) mobIcon.setAttribute('data-lucide', 'moon');
                 if (deskIcon) deskIcon.setAttribute('data-lucide', 'moon');
             } else {
                 html.classList.remove('light-mode');
-                if (mobIcon) mobIcon.setAttribute('data-lucide', 'moon');
+                html.classList.add('dark');
+                if (mobIcon) mobIcon.setAttribute('data-lucide', 'sun');
                 if (deskIcon) deskIcon.setAttribute('data-lucide', 'sun');
             }
+            
+            // Update icons
+            lucide.createIcons();
             lucide.createIcons();
         },
         toggleMobileMenu() {
@@ -1941,9 +1948,12 @@ App.Comments = {
     
     async loadComments() {
         try {
+            console.log('[DEBUG] Loading comments...');
             const result = await App.Data.api('komentar');
+            console.log('[DEBUG] API result:', result);
             // Handle different response formats
             const comments = (result && result.data && Array.isArray(result.data)) ? result.data : (result || []);
+            console.log('[DEBUG] Parsed comments:', comments, 'Count:', comments.length);
             this.comments = this.buildThread(comments);
             this.renderComments();
         } catch (err) {
