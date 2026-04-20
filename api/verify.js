@@ -69,11 +69,14 @@ export default async function handler(request) {
             return new Response(JSON.stringify({ error: 'Nama dan WhatsApp wajib diisi' }), { status: 400, headers });
         }
 
+        // Normalize WhatsApp (strip leading 0)
+        const normalizedWa = whatsapp.trim().startsWith('0') ? whatsapp.trim().substring(1) : whatsapp.trim();
+        
         const result = await tursoQuery(
             `SELECT id, nama, whatsapp FROM peserta 
-             WHERE nama = ? AND whatsapp = ?
+             WHERE nama = ? AND (whatsapp = ? OR whatsapp = ?)
              LIMIT 1`,
-            [nama.trim(), whatsapp.trim()]
+            [nama.trim(), normalizedWa, whatsapp.trim()]
         );
         
         if (result.length > 0) {
