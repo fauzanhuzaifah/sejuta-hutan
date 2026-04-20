@@ -2128,6 +2128,42 @@ App.Comments = {
 window.App = App;
 
 // --- START APPLICATION ---
+// Force set dummy data for testing
+const dummyData = [
+    {
+        id: 1,
+        nama: "Ahmad Fauzi",
+        whatsapp: "081234567890",
+        email: "ahmad.fauzi@email.com",
+        usia: 28,
+        pekerjaan: "Guru",
+        alamat: "Lhokseumawe",
+        jumlah_pohon: 10,
+        jumlah: 10,
+        motivasi: "Untuk masa depan yang lebih hijau",
+        tanggal: "15 Januari 2024",
+        timestamp: "2024-01-15T10:30:00Z",
+        _synced: true
+    },
+    {
+        id: 2,
+        nama: "Siti Nurhaliza",
+        whatsapp: "082345678901",
+        email: "siti.nur@email.com",
+        usia: 32,
+        pekerjaan: "Dokter",
+        alamat: "Banda Aceh",
+        jumlah_pohon: 15,
+        jumlah: 15,
+        motivasi: "Menanam pohon untuk ketahanan lingkungan",
+        tanggal: "16 Januari 2024",
+        timestamp: "2024-01-16T14:20:00Z",
+        _synced: true
+    }
+];
+localStorage.setItem(App.Config.STORAGE_KEY, JSON.stringify(dummyData));
+console.log('Dummy data forced:', dummyData);
+
 App.I18n.init();
 App.UI.init();
 App.Comments.init();
