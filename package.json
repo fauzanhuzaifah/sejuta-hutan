@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "Menanam Sejuta Pohon — Kota Lhokseumawe",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "vercel dev"
