@@ -1,15 +1,50 @@
 export const config = { runtime: 'edge' };
 
-import { createClient } from '@libsql/client/web';
+const rawUrl = process.env.TURSO_URL || '';
+const TURSO_URL = rawUrl.replace(/^libsql:\/\//, 'https://');
+const TURSO_TOKEN = process.env.TURSO_TOKEN;
+
+async function tursoQuery(sql, args = []) {
+    const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${TURSO_TOKEN}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            requests: [{ 
+                type: 'execute', 
+                stmt: { 
+                    sql, 
+                    args: args.map(a => a === null ? { type: 'null' } : { type: 'text', value: String(a) })
+                } 
+            }]
+        })
+    });
+    
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Turso HTTP ${response.status}: ${text}`);
+    }
+    
+    const data = await response.json();
+    const result = data.results?.[0]?.response?.result;
+    
+    if (!result || !result.cols) return [];
+    
+    return (result.rows || []).map(row => {
+        const obj = {};
+        result.cols.forEach((col, i) => {
+            const val = row[i];
+            obj[col.name] = val?.value ?? null;
+        });
+        return obj;
+    });
+}
 
 export default async function handler(request) {
     const method = request.method;
     
-    const turso = createClient({
-        url: process.env.TURSO_URL,
-        authToken: process.env.TURSO_TOKEN
-    });
-
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
@@ -34,15 +69,15 @@ export default async function handler(request) {
             return new Response(JSON.stringify({ error: 'Nama dan WhatsApp wajib diisi' }), { status: 400, headers });
         }
 
-        const result = await turso.execute({
-            sql: `SELECT id, nama, whatsapp FROM peserta 
-                  WHERE nama = ? AND whatsapp = ?
-                  LIMIT 1`,
-            args: [nama.trim(), whatsapp.trim()]
-        });
+        const result = await tursoQuery(
+            `SELECT id, nama, whatsapp FROM peserta 
+             WHERE nama = ? AND whatsapp = ?
+             LIMIT 1`,
+            [nama.trim(), whatsapp.trim()]
+        );
         
-        if (result.rows.length > 0) {
-            return new Response(JSON.stringify({ success: true, user: result.rows[0] }), { headers });
+        if (result.length > 0) {
+            return new Response(JSON.stringify({ success: true, user: result[0] }), { headers });
         } else {
             return new Response(JSON.stringify({ 
                 success: false, 
