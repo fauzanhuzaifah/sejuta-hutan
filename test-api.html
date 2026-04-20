@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Komentar</title>
+</head>
+<body>
+    <h1>Test API Komentar</h1>
+    <div id="result"></div>
+    <script>
+        async function testApi() {
+            try {
+                const response = await fetch('/api/komentar');
+                const data = await response.json();
+                document.getElementById('result').innerHTML = 
+                    '<h2>Status: ' + response.status + '</h2>' +
+                    '<h3>Data:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (err) {
+                document.getElementById('result').innerHTML = 
+                    '<h2>Error:</h2><pre>' + err.message + '</pre>';
+            }
+        }
+        testApi();
+    </script>
+</body>
+</html>
