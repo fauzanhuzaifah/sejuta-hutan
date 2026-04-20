@@ -1,8 +1,46 @@
 export const config = { runtime: 'edge' };
 
-import { neon } from '@neondatabase/serverless';
+const rawUrl = process.env.TURSO_URL || '';
+const TURSO_URL = rawUrl.replace(/^libsql:\/\//, 'https://');
+const TURSO_TOKEN = process.env.TURSO_TOKEN;
 
-const sql = neon(process.env.DATABASE_URL);
+async function tursoQuery(sql, args = []) {
+    const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${TURSO_TOKEN}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            requests: [{ 
+                type: 'execute', 
+                stmt: { 
+                    sql, 
+                    args: args.map(a => a === null ? { type: 'null' } : { type: 'text', value: String(a) })
+                } 
+            }]
+        })
+    });
+    
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Turso HTTP ${response.status}: ${text}`);
+    }
+    
+    const data = await response.json();
+    const result = data.results?.[0]?.response?.result;
+    
+    if (!result || !result.cols) return [];
+    
+    return (result.rows || []).map(row => {
+        const obj = {};
+        result.cols.forEach((col, i) => {
+            const val = row[i];
+            obj[col.name] = val?.value ?? null;
+        });
+        return obj;
+    });
+}
 
 export default async function handler(request) {
     const method = request.method;
@@ -20,17 +58,18 @@ export default async function handler(request) {
 
     try {
         if (method === 'GET') {
-            const rows = await sql`SELECT * FROM peserta ORDER BY id DESC`;
+            const rows = await tursoQuery('SELECT * FROM peserta ORDER BY id DESC');
             return new Response(JSON.stringify(rows), { headers });
         }
         else if (method === 'POST') {
             const body = await request.json();
             const { nama, whatsapp, email, usia, pekerjaan, alamat, jumlah_pohon, motivasi } = body;
             
-            await sql`
-                INSERT INTO peserta (nama, whatsapp, email, usia, pekerjaan, alamat, jumlah_pohon, motivasi, created_at) 
-                VALUES (${nama}, ${whatsapp}, ${email || null}, ${usia || null}, ${pekerjaan}, ${alamat}, ${jumlah_pohon || 1}, ${motivasi}, NOW())
-            `;
+            await tursoQuery(
+                `INSERT INTO peserta (nama, whatsapp, email, usia, pekerjaan, alamat, jumlah_pohon, motivasi, created_at) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+                [nama, whatsapp, email || null, usia || null, pekerjaan, alamat, jumlah_pohon || 1, motivasi]
+            );
             
             return new Response(JSON.stringify({ success: true, message: 'Data saved' }), { status: 201, headers });
         }
@@ -39,9 +78,9 @@ export default async function handler(request) {
             const id = url.searchParams.get('id');
             
             if (id) {
-                await sql`DELETE FROM peserta WHERE id = ${id}`;
+                await tursoQuery('DELETE FROM peserta WHERE id = ?', [id]);
             } else {
-                await sql`DELETE FROM peserta`;
+                await tursoQuery('DELETE FROM peserta');
             }
             return new Response(JSON.stringify({ success: true, message: 'Data deleted' }), { headers });
         }
