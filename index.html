@@ -1334,27 +1334,37 @@ const App = {
             const base = this.getApiBase();
             const url = base ? `${base}/api/${endpoint}` : `/api/${endpoint}`;
             
+            console.log(`API Request: ${url}`);
+            
             try {
                 const res = await fetch(url, {
                     headers: { 'Content-Type': 'application/json' },
                     ...options
                 });
                 
+                console.log(`API Response: ${res.status} ${res.statusText}`);
+                
                 if (!res.ok) {
                     const errorText = await res.text();
+                    console.error(`API Error Response: ${errorText}`);
                     throw new Error(`API Error: ${res.status} - ${errorText}`);
                 }
                 
-                return res.json();
+                const data = await res.json();
+                console.log(`API Success:`, data);
+                return data;
             } catch (error) {
+                console.error(`API Fetch Error:`, error);
                 throw error;
             }
         },
         getAll() {
             const data = JSON.parse(localStorage.getItem(App.Config.STORAGE_KEY) || '[]');
+            console.log('getAll() - Retrieved data:', data);
             
             // If no data exists, add some dummy data for testing
             if (data.length === 0) {
+                console.log('No data found, adding dummy data for testing');
                 const dummyData = [
                     {
                         id: 1,
@@ -1405,7 +1415,7 @@ const App = {
             const data = this.getAll();
             const entry = data[index];
             if (entry && entry.id) {
-                try { await this.api(`peserta/${entry.id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+                try { await this.api(`peserta-robust/${entry.id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
             }
             data.splice(index, 1);
             this.save(data);
@@ -1415,7 +1425,7 @@ const App = {
         },
         async sendToDB(data) {
             try {
-                await this.api('peserta', {
+                await this.api('peserta-robust', {
                     method: 'POST',
                     body: JSON.stringify(data)
                 });
@@ -1426,10 +1436,76 @@ const App = {
             }
         },
         async sync() {
-            // Use localStorage only - bypass API
-            const local = this.getAll();
-            App.UI.renderTable();
-            return true;
+            try {
+                console.log('Starting data sync...');
+                let remote;
+                
+                try {
+                    // Try robust endpoint first
+                    remote = await this.api('peserta-robust');
+                    console.log('Robust API successful, data received:', remote);
+                } catch (mainError) {
+                    console.warn('Robust API failed, trying fallback endpoint:', mainError.message);
+                    
+                    try {
+                        // Try simple fallback endpoint
+                        remote = await this.api('peserta-simple');
+                        console.log('Fallback API successful, data received:', remote);
+                    } catch (fallbackError) {
+                        console.error('Both robust and fallback APIs failed');
+                        throw mainError; // Use original error
+                    }
+                }
+                
+                // Handle different response formats
+                if (remote && remote.data && Array.isArray(remote.data)) {
+                    remote = remote.data;
+                } else if (!Array.isArray(remote)) {
+                    console.error('Invalid data format from API:', remote);
+                    throw new Error("Invalid Format: Expected array but got " + typeof remote);
+                }
+                
+                // Merge: local data first, then add remote data by ID
+                const local = this.getAll();
+                console.log('Local data:', local);
+                
+                const remoteIds = new Set(remote.map(r => r.id));
+                
+                const normalized = remote.map(r => ({
+                    id: r.id,
+                    nama: r.nama, 
+                    wa: r.whatsapp, 
+                    whatsapp: r.whatsapp,
+                    email: r.email,
+                    usia: r.usia,
+                    pekerjaan: r.pekerjaan, 
+                    alamat: r.alamat,
+                    jumlah_pohon: r.jumlah_pohon || r.jumlah || 1,
+                    motivasi: r.motivasi || "Dari Database Server",
+                    tanggal: new Date(r.created_at || r.timestamp).toLocaleDateString('id-ID'),
+                    timestamp: r.created_at || r.timestamp
+                })).filter(r => r.nama);
+                
+                console.log('Normalized data:', normalized);
+                
+                // Keep local entries that don't exist in remote (new registrations)
+                const localOnly = local.filter(l => !remoteIds.has(l.id) && !l._synced);
+                
+                const combined = [...normalized, ...localOnly];
+                console.log('Combined data:', combined);
+                
+                this.save(combined);
+                App.UI.renderTable();
+                console.log('Data sync completed successfully');
+                return true;
+            } catch (e) {
+                console.error('Data sync failed:', e);
+                
+                // Show user-friendly error message
+                App.UI.showToast('toast_error_title', 'Tidak dapat memuat data dari server. Menggunakan data lokal.', true);
+                
+                return false;
+            }
         },
     },
 
@@ -1481,8 +1557,18 @@ const App = {
             App.Effects.initScrollReveal();
             
             // --- 6. Initial Render & Sync ---
+            console.log('Starting initial render and sync...');
             this.renderTable();
-            App.Data.sync();
+            App.Data.sync().then(success => {
+                console.log('Initial sync completed:', success);
+                if (success) {
+                    console.log('Data loaded successfully from server');
+                } else {
+                    console.log('Using local data or fallback');
+                }
+            }).catch(error => {
+                console.error('Initial sync error:', error);
+            });
         },
         toggleTheme() {
             const current = localStorage.getItem('theme') || 'dark';
@@ -1665,15 +1751,26 @@ const App = {
         },
 
         renderTable() {
+            console.log('=== renderTable() called ===');
             const data = App.Data.getAll();
-            const tbody = document.getElementById('data-table-body');
+            console.log('Data retrieved from getAll():', data);
+            console.log('Data length:', data.length);
             
-            if (!tbody) return;
+            const tbody = document.getElementById('data-table-body');
+            console.log('Table body element:', tbody);
+            
+            if (!tbody) {
+                console.error('ERROR: Table body element not found!');
+                return;
+            }
             
             // Update Stats
             const totalRegistrantsEl = document.getElementById('total-registrants');
+            console.log('Total registrants element:', totalRegistrantsEl);
             if (totalRegistrantsEl) {
                 totalRegistrantsEl.innerText = data.length;
+            } else {
+                console.error('ERROR: total-registrants element not found!');
             }
             const totalTrees = data.reduce((sum, item) => sum + (parseInt(item.jumlah_pohon || item.jumlah) || 0), 0);
             const pct = Math.min((data.length / 10000) * 100, 100);
@@ -2128,42 +2225,6 @@ App.Comments = {
 window.App = App;
 
 // --- START APPLICATION ---
-// Force set dummy data for testing
-const dummyData = [
-    {
-        id: 1,
-        nama: "Ahmad Fauzi",
-        whatsapp: "081234567890",
-        email: "ahmad.fauzi@email.com",
-        usia: 28,
-        pekerjaan: "Guru",
-        alamat: "Lhokseumawe",
-        jumlah_pohon: 10,
-        jumlah: 10,
-        motivasi: "Untuk masa depan yang lebih hijau",
-        tanggal: "15 Januari 2024",
-        timestamp: "2024-01-15T10:30:00Z",
-        _synced: true
-    },
-    {
-        id: 2,
-        nama: "Siti Nurhaliza",
-        whatsapp: "082345678901",
-        email: "siti.nur@email.com",
-        usia: 32,
-        pekerjaan: "Dokter",
-        alamat: "Banda Aceh",
-        jumlah_pohon: 15,
-        jumlah: 15,
-        motivasi: "Menanam pohon untuk ketahanan lingkungan",
-        tanggal: "16 Januari 2024",
-        timestamp: "2024-01-16T14:20:00Z",
-        _synced: true
-    }
-];
-localStorage.setItem(App.Config.STORAGE_KEY, JSON.stringify(dummyData));
-console.log('Dummy data forced:', dummyData);
-
 App.I18n.init();
 App.UI.init();
 App.Comments.init();
