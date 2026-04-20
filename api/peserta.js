@@ -1,11 +1,11 @@
-import { createClient } from '@libsql/client/web';
+const { createClient } = require('@libsql/client');
 
 const turso = createClient({
     url: process.env.TURSO_URL,
     authToken: process.env.TURSO_TOKEN
 });
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

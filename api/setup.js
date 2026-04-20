@@ -1,4 +1,4 @@
-import { createClient } from '@libsql/client/web';
+const { createClient } = require('@libsql/client');
 
 const turso = createClient({
     url: process.env.TURSO_URL,
@@ -36,7 +36,7 @@ CREATE INDEX IF NOT EXISTS idx_komentar_parent ON komentar(parent_id);
 CREATE INDEX IF NOT EXISTS idx_komentar_deleted ON komentar(is_deleted);
 `;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     
     try {
