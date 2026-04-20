@@ -1380,6 +1380,10 @@ const App = {
                 const remote = await this.api('peserta');
                 if (!Array.isArray(remote)) throw new Error("Invalid Format");
                 
+                // Merge: local data first, then add remote data by ID
+                const local = this.getAll();
+                const remoteIds = new Set(remote.map(r => r.id));
+                
                 const normalized = remote.map(r => ({
                     id: r.id,
                     nama: r.nama, 
@@ -1395,7 +1399,11 @@ const App = {
                     timestamp: r.created_at || r.timestamp
                 })).filter(r => r.nama);
                 
-                this.save(normalized);
+                // Keep local entries that don't exist in remote (new registrations)
+                const localOnly = local.filter(l => !remoteIds.has(l.id) && !l._synced);
+                
+                const combined = [...normalized, ...localOnly];
+                this.save(combined);
                 App.UI.renderTable();
                 return true;
             } catch (e) {
