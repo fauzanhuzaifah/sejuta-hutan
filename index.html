@@ -1965,6 +1965,7 @@ App.Comments = {
     },
     
     buildThread(flatComments) {
+        console.log('[DEBUG] buildThread input:', flatComments);
         const map = new Map();
         const roots = [];
         
@@ -1982,6 +1983,8 @@ App.Comments = {
             }
         });
         
+        console.log('[DEBUG] buildThread roots count:', roots.length);
+        
         // Sort roots based on sortBy
         if (this.sortBy === 'newest') {
             roots.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -1990,6 +1993,8 @@ App.Comments = {
         } else if (this.sortBy === 'popular') {
             roots.sort((a, b) => (b.suka || 0) - (a.suka || 0));
         }
+        
+        console.log('[DEBUG] buildThread output:', roots);
         
         return roots;
     },
