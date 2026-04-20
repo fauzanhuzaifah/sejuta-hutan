@@ -1,6 +1,8 @@
 export const config = { runtime: 'edge' };
 
-const TURSO_URL = process.env.TURSO_URL;
+// Convert libsql:// to https:// for HTTP API
+const rawUrl = process.env.TURSO_URL || '';
+const TURSO_URL = rawUrl.replace(/^libsql:\/\//, 'https://');
 const TURSO_TOKEN = process.env.TURSO_TOKEN;
 
 async function tursoQuery(sql, args = []) {
