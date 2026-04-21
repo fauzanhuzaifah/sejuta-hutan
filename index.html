@@ -1362,18 +1362,35 @@ const App = {
 
     // --- 3. UTILITIES ---
     Utils: {
-        escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); },
-        normalizeWA(raw) {
-            if (!raw) return '';
-            let wa = String(raw).trim().replace(/[\s.-]/g, '');
-            if (wa.startsWith('+62')) wa = '0' + wa.slice(3);
+        escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        },
+        normalizeWA(wa) {
+            if (!wa) return '';
+            wa = String(wa).trim().replace(/[^0-9]/g, '');
             if (wa.startsWith('62')) wa = '0' + wa.slice(2);
             return wa.startsWith('8') ? '0' + wa : wa;
         },
         formatDate(date) {
             return new Date(date).toLocaleDateString(this.current === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+        },
+        formatTimestamp(ts) {
+            if (!ts) return '-';
+            let v = ts;
+            if (typeof v === 'number' && v < 1000000000000) v = v * 1000;
+            const d = new Date(v);
+            if (Number.isNaN(d.getTime())) return '-';
+            const locale = App.I18n.current === 'id' ? 'id-ID' : 'en-US';
+            return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
         }
     },
+
 
     // --- 4. DATA MANAGEMENT (Storage & API) ---
     Data: {
@@ -1468,7 +1485,9 @@ const App = {
                 
                 const remoteIds = new Set(remote.map(r => r.id));
                 
-                const normalized = remote.map(r => ({
+                const normalized = remote.map(r => {
+                    const ts = r.timestamp || r.created_at || r.createdAt || r.created || null;
+                    return ({
                     id: r.id,
                     nama: r.nama, 
                     wa: r.whatsapp, 
@@ -1479,9 +1498,10 @@ const App = {
                     alamat: r.alamat,
                     jumlah_pohon: r.jumlah_pohon || r.jumlah || 1,
                     motivasi: r.motivasi || "Dari Database Server",
-                    tanggal: new Date(r.created_at || r.timestamp).toLocaleDateString('id-ID'),
-                    timestamp: r.created_at || r.timestamp
-                })).filter(r => r.nama);
+                    tanggal: App.Utils.formatTimestamp(ts),
+                    timestamp: ts
+                    });
+                }).filter(r => r.nama);
                 
                 console.log('Normalized data:', normalized);
                 
@@ -1505,6 +1525,7 @@ const App = {
             }
         },
     },
+
 
     // --- 6. UI MANAGER ---
     UI: {
@@ -1798,7 +1819,9 @@ const App = {
                 return this.renderTable();
             }
 
-            tbody.innerHTML = paginatedData.map((d, i) => `
+            tbody.innerHTML = paginatedData.map((d, i) => {
+                const tanggal = (d.tanggal && d.tanggal !== 'Invalid Date') ? d.tanggal : App.Utils.formatTimestamp(d.timestamp);
+                return `
             <tr onclick="App.UI.openDetail(${start + i})" class="border-t border-forest-800/20 hover:bg-forest-900/20 transition-colors cursor-pointer light-mode:hover:bg-green-50">
             <td class="px-5 py-3 text-forest-500 text-xs light-mode:text-forest-500">${start + i + 1}</td>
             <td class="px-5 py-3 text-forest-200 font-medium light-mode:text-forest-800">${App.Utils.escapeHtml(d.nama)}</td>
@@ -1809,9 +1832,10 @@ const App = {
                 ${d.motivasi || '-'}
             </td>
             
-            <td class="px-5 py-3 text-forest-500 text-xs light-mode:text-forest-500">${d.tanggal}</td>
+            <td class="px-5 py-3 text-forest-500 text-xs light-mode:text-forest-500">${tanggal}</td>
             </tr>
-    `       ).join('');
+    `;
+            }).join('');
             
             this.updatePaginationControls();
             lucide.createIcons();
