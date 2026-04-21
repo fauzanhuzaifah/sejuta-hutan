@@ -491,6 +491,47 @@
 </section>
 <div class="section-divider"></div>
 
+<!-- TRUST BAR -->
+<section class="py-10 bg-forest-950 light-mode:bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="bg-forest-900/40 border border-forest-700/30 rounded-2xl p-5 flex gap-3 items-start light-mode:bg-green-50 light-mode:border-green-200">
+                <div class="w-10 h-10 rounded-xl bg-forest-700/20 flex items-center justify-center flex-shrink-0 light-mode:bg-white">
+                    <i data-lucide="users" class="w-5 h-5 text-forest-300 light-mode:text-green-600"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-forest-500 tracking-[0.2em] uppercase mb-1 light-mode:text-green-600">Penyelenggara</p>
+                    <p class="text-sm text-forest-200 font-semibold leading-snug light-mode:text-forest-900">Komunitas Sejuta Pohon Lhokseumawe</p>
+                </div>
+            </div>
+            <div class="bg-forest-900/40 border border-forest-700/30 rounded-2xl p-5 flex gap-3 items-start light-mode:bg-green-50 light-mode:border-green-200">
+                <div class="w-10 h-10 rounded-xl bg-forest-700/20 flex items-center justify-center flex-shrink-0 light-mode:bg-white">
+                    <i data-lucide="message-circle" class="w-5 h-5 text-forest-300 light-mode:text-green-600"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-forest-500 tracking-[0.2em] uppercase mb-1 light-mode:text-green-600">Konfirmasi via WhatsApp</p>
+                    <p class="text-sm text-forest-400 leading-snug light-mode:text-forest-700">Setelah daftar, tim kami akan menghubungi WhatsApp Anda untuk konfirmasi data.</p>
+                </div>
+            </div>
+            <div class="bg-forest-900/40 border border-forest-700/30 rounded-2xl p-5 flex gap-3 items-start light-mode:bg-green-50 light-mode:border-green-200">
+                <div class="w-10 h-10 rounded-xl bg-forest-700/20 flex items-center justify-center flex-shrink-0 light-mode:bg-white">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-forest-300 light-mode:text-green-600"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-forest-500 tracking-[0.2em] uppercase mb-1 light-mode:text-green-600">Keamanan Data</p>
+                    <p class="text-sm text-forest-400 leading-snug light-mode:text-forest-700">Data digunakan untuk koordinasi program. Anda bisa meminta data dihapus kapan saja.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6 flex justify-center">
+            <a href="#form" class="btn-primary px-7 py-3.5 rounded-2xl font-bold text-white text-sm md:text-base inline-flex items-center gap-2">
+                <i data-lucide="heart-handshake" class="w-5 h-5"></i>
+                <span>Daftar Sekarang</span>
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- BAGIAN: TENTANG, DAMPAK, MANFAAT (Disingkat untuk efisiensi, konten tetap sama) -->
 <section id="tentang" class="py-24 bg-forest-950 light-mode:bg-white relative overflow-hidden">
     <div class="max-w-6xl mx-auto px-6">
@@ -753,6 +794,7 @@
                         <div>
                             <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_wa">No. WhatsApp *</label>
                             <input type="tel" id="f-wa" required class="form-input w-full px-4 py-3 rounded-xl text-sm">
+                            <p class="mt-2 text-[11px] leading-snug text-forest-500 light-mode:text-forest-600">Contoh: 08xxxxxxxxxx (tanpa spasi). Data WhatsApp digunakan untuk koordinasi program.</p>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_email">Email</label>
