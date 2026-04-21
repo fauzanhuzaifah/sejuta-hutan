@@ -1382,12 +1382,26 @@ const App = {
         },
         formatTimestamp(ts) {
             if (!ts) return '-';
-            let v = ts;
-            if (typeof v === 'number' && v < 1000000000000) v = v * 1000;
-            const d = new Date(v);
-            if (Number.isNaN(d.getTime())) return '-';
-            const locale = App.I18n.current === 'id' ? 'id-ID' : 'en-US';
-            return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+            try {
+                // Handle numeric timestamps (seconds vs milliseconds)
+                let v = ts;
+                if (typeof v === 'number') {
+                    // If timestamp is in seconds (less than year 2000 in ms), convert to ms
+                    if (v < 1000000000000) v = v * 1000;
+                } else if (typeof v === 'string') {
+                    // Try to parse as number if it's a string of digits
+                    if (/^\d+$/.test(v)) {
+                        const num = parseInt(v, 10);
+                        v = num < 1000000000000 ? num * 1000 : num;
+                    }
+                }
+                const d = new Date(v);
+                if (Number.isNaN(d.getTime())) return '-';
+                const locale = App.I18n.current === 'id' ? 'id-ID' : 'en-US';
+                return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+            } catch (e) {
+                return '-';
+            }
         }
     },
 
