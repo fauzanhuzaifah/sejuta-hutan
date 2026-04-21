@@ -1834,28 +1834,39 @@ const App = {
             }
         },
         initScrollReveal() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                        // Count up effect logic
-                        entry.target.querySelectorAll('.count-up').forEach(el => {
-                            const target = parseInt(el.getAttribute('data-target'));
-                            if (target && !el.dataset.done) {
-                                el.dataset.done = 'true';
-                                let curr = 0;
-                                const step = Math.ceil(target / 50);
-                                const timer = setInterval(() => {
-                                    curr += step;
-                                    if (curr >= target) { curr = target; clearInterval(timer); }
-                                    el.innerText = curr.toLocaleString(App.I18n.current === 'id' ? 'id-ID' : 'en-US');
-                                }, 30);
-                            }
-                        });
-                    }
-                });
-            }, { threshold: 0.1 });
-            document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+            const targets = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+            if (!('IntersectionObserver' in window)) {
+                targets.forEach(el => el.classList.add('active'));
+                return;
+            }
+
+            try {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('active');
+                            // Count up effect logic
+                            entry.target.querySelectorAll('.count-up').forEach(el => {
+                                const target = parseInt(el.getAttribute('data-target'));
+                                if (target && !el.dataset.done) {
+                                    el.dataset.done = 'true';
+                                    let curr = 0;
+                                    const step = Math.ceil(target / 50);
+                                    const timer = setInterval(() => {
+                                        curr += step;
+                                        if (curr >= target) { curr = target; clearInterval(timer); }
+                                        el.innerText = curr.toLocaleString(App.I18n.current === 'id' ? 'id-ID' : 'en-US');
+                                    }, 30);
+                                }
+                            });
+                        }
+                    });
+                }, { threshold: 0.1 });
+                targets.forEach(el => observer.observe(el));
+            } catch (e) {
+                console.error('Scroll reveal init failed:', e);
+                targets.forEach(el => el.classList.add('active'));
+            }
         }
     }
 };
