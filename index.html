@@ -630,8 +630,64 @@
                     </div>
                 </div>
 
-                <!-- 2. Kotak Tahukah Anda (Sudah dipindahkan ke dalam container di atas) -->
-                <div class="bg-gradient-to-br from-amber-950/30 to-forest-950 border border-amber-700/20 rounded-3xl p-6 mt-6 light-mode:bg-amber-50/30 light-mode:border-amber-200">
+                <!-- 2. Statistik Total Pohon -->
+                <div class="bg-gradient-to-br from-emerald-900/80 to-forest-950 border border-emerald-700/30 rounded-3xl p-6 light-mode:bg-gradient-to-br light-mode:from-emerald-50 light-mode:to-white light-mode:border-emerald-200 light-mode:shadow-lg">
+                    <h4 class="font-bold text-emerald-200 text-sm mb-4 flex items-center gap-2 light-mode:text-emerald-800"><i data-lucide="tree-pine" class="w-4 h-4 text-emerald-400"></i><span>Total Pohon Didaftarkan</span></h4>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-3xl font-extrabold text-emerald-300 light-mode:text-emerald-700" id="total-trees">0</p>
+                            <p class="text-xs text-emerald-500/70 mt-1">bibit yang akan ditanam</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-800/50 flex items-center justify-center light-mode:bg-emerald-100">
+                            <i data-lucide="sprout" class="w-6 h-6 text-emerald-400 light-mode:text-emerald-600"></i>
+                        </div>
+                    </div>
+                    <!-- Mini bar chart -->
+                    <div class="mt-4 flex items-end gap-1 h-12">
+                        <div class="flex-1 bg-emerald-700/30 rounded-t" style="height: 40%"></div>
+                        <div class="flex-1 bg-emerald-600/40 rounded-t" style="height: 60%"></div>
+                        <div class="flex-1 bg-emerald-500/50 rounded-t" style="height: 45%"></div>
+                        <div class="flex-1 bg-emerald-400/60 rounded-t" style="height: 80%"></div>
+                        <div class="flex-1 bg-emerald-500/50 rounded-t" style="height: 55%"></div>
+                        <div class="flex-1 bg-emerald-600/40 rounded-t" style="height: 70%"></div>
+                        <div class="flex-1 bg-emerald-700/30 rounded-t" style="height: 50%"></div>
+                    </div>
+                </div>
+
+                <!-- 3. Statistik Rata-rata -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gradient-to-br from-blue-900/60 to-forest-950 border border-blue-700/30 rounded-2xl p-4 light-mode:bg-blue-50 light-mode:border-blue-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="calculator" class="w-4 h-4 text-blue-400"></i>
+                            <span class="text-xs text-blue-300 light-mode:text-blue-700">Rata-rata</span>
+                        </div>
+                        <p class="text-xl font-bold text-blue-200 light-mode:text-blue-800" id="avg-trees">0</p>
+                        <p class="text-[10px] text-blue-500/70">pohon/peserta</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-900/60 to-forest-950 border border-purple-700/30 rounded-2xl p-4 light-mode:bg-purple-50 light-mode:border-purple-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="trending-up" class="w-4 h-4 text-purple-400"></i>
+                            <span class="text-xs text-purple-300 light-mode:text-purple-700">Target</span>
+                        </div>
+                        <p class="text-xl font-bold text-purple-200 light-mode:text-purple-800">1jt</p>
+                        <p class="text-[10px] text-purple-500/70">pohon total</p>
+                    </div>
+                </div>
+
+                <!-- 4. Distribusi Pekerjaan (Horizontal Bars) -->
+                <div class="bg-gradient-to-br from-forest-900/80 to-forest-950 border border-forest-700/30 rounded-3xl p-6 light-mode:bg-white light-mode:border-green-200 light-mode:shadow-lg">
+                    <h4 class="font-bold text-forest-200 text-sm mb-4 flex items-center gap-2 light-mode:text-forest-800">
+                        <i data-lucide="pie-chart" class="w-4 h-4 text-forest-400"></i>
+                        <span>Distribusi Peserta</span>
+                    </h4>
+                    <div id="job-distribution" class="space-y-3">
+                        <!-- Will be populated by JS -->
+                        <div class="text-xs text-forest-500 text-center">Memuat data...</div>
+                    </div>
+                </div>
+
+                <!-- 5. Kotak Tahukah Anda -->
+                <div class="bg-gradient-to-br from-amber-950/30 to-forest-950 border border-amber-700/20 rounded-3xl p-6 light-mode:bg-amber-50/30 light-mode:border-amber-200">
                     <h4 class="font-bold text-amber-300 text-sm mb-4 flex items-center gap-2 light-mode:text-amber-700">
                         <i data-lucide="zap" class="w-4 h-4"></i>
                         <span data-i18n="didyouknow_title">Tahukah Anda?</span>
@@ -1386,18 +1442,30 @@ const App = {
         formatTimestamp(ts) {
             if (!ts) return '-';
             try {
+                // Handle SQLite datetime format from Turso (e.g., "2024-01-15 14:30:00")
+                if (typeof ts === 'string') {
+                    // Check if it's SQLite datetime format
+                    if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}/.test(ts)) {
+                        const d = new Date(ts);
+                        if (!Number.isNaN(d.getTime())) {
+                            const locale = App.I18n.current === 'id' ? 'id-ID' : 'en-US';
+                            return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+                        }
+                    }
+                    // Try to parse as number if it's a string of digits
+                    if (/^\d+$/.test(ts)) {
+                        const num = parseInt(ts, 10);
+                        ts = num < 1000000000000 ? num * 1000 : num;
+                    }
+                }
+                
                 // Handle numeric timestamps (seconds vs milliseconds)
                 let v = ts;
                 if (typeof v === 'number') {
                     // If timestamp is in seconds (less than year 2000 in ms), convert to ms
                     if (v < 1000000000000) v = v * 1000;
-                } else if (typeof v === 'string') {
-                    // Try to parse as number if it's a string of digits
-                    if (/^\d+$/.test(v)) {
-                        const num = parseInt(v, 10);
-                        v = num < 1000000000000 ? num * 1000 : num;
-                    }
                 }
+                
                 const d = new Date(v);
                 if (Number.isNaN(d.getTime())) return '-';
                 const locale = App.I18n.current === 'id' ? 'id-ID' : 'en-US';
@@ -1844,27 +1912,6 @@ const App = {
             const tbody = document.getElementById('data-table-body');
             console.log('Table body element:', tbody);
             
-            if (!tbody) {
-                console.error('ERROR: Table body element not found!');
-                return;
-            }
-            
-            // Update Stats
-            const totalRegistrantsEl = document.getElementById('total-registrants');
-            console.log('Total registrants element:', totalRegistrantsEl);
-            if (totalRegistrantsEl) {
-                totalRegistrantsEl.innerText = data.length;
-            } else {
-                console.error('ERROR: total-registrants element not found!');
-            }
-            const totalTrees = data.reduce((sum, item) => sum + (parseInt(item.jumlah_pohon || item.jumlah) || 0), 0);
-            const pct = Math.min((data.length / 10000) * 100, 100);
-            document.getElementById('progress-pct').innerText = pct + '%';
-            document.getElementById('progress-ring').style.strokeDashoffset = 213.6 - (213.6 * pct / 100);
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-12 text-center text-forest-600 light-mode:text-forest-400"><div class="inline-flex items-center justify-center w-10 h-10 mb-3 rounded-full bg-forest-900 light-mode:bg-green-50"><i data-lucide="inbox" class="w-5 h-5 opacity-30"></i></div><p class="text-sm">${App.I18n.get('empty_table')}</p></td></tr>`;
-                lucide.createIcons();
                 return;
             }
             
