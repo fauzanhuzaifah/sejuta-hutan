@@ -72,9 +72,11 @@ export default async function handler(request) {
                 [nama, normalizedWa, whatsapp]
             );
             
-            if (participants.length > 0) {
-                pesertaId = participants[0].id;
+            if (participants.length === 0) {
+                return new Response(JSON.stringify({ success: false, message: 'Nama dan nomor WhatsApp tidak terdaftar.' }), { status: 403, headers });
             }
+
+            const pesertaId = participants[0].id;
             
             await tursoQuery(
                 `INSERT INTO komentar (nama, whatsapp, isi, parent_id, peserta_id, suka, created_at) 

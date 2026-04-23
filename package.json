@@ -6,12 +6,13 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "vercel dev"
+    "dev": "http-server -c-1"
   },
   "dependencies": {
     "@libsql/client": "^0.14.0"
   },
   "devDependencies": {
+    "http-server": "^14.1.1",
     "vercel": "^41.0.0"
   }
 }

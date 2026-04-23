@@ -1,24 +1,7 @@
 {
-    "version": 2,
-    "functions": {
-        "api/*.js": {
-            "maxDuration": 10,
-            "includeFiles": "package.json"
-        }
-    },
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "/api/$1.js"
-        },
-        {
-            "src": "/admin",
-            "dest": "/admin.html"
-        }
-    ],
-    "build": {
-        "env": {
-            "NODEJS_HELPERS": "false"
-        }
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
     }
+  }
 }
