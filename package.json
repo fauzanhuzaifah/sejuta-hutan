@@ -5,8 +5,9 @@
   "main": "index.html",
   "scripts": {
     "dev": "npx serve -s .",
-    "build": "echo 'Static site - no build needed'",
-    "start": "npx serve -s . -l 3000"
+    "build": "node build.js",
+    "start": "npx serve -s . -l 3000",
+    "vercel-build": "node build.js"
   },
   "devDependencies": {
     "serve": "^14.2.1"

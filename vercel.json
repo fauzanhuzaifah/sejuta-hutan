@@ -2,13 +2,15 @@
   "version": 2,
   "public": true,
   "name": "sejuta-pohon",
-  "builds": [
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    }
-  ],
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": ".",
+  "installCommand": "npm install",
+  "framework": null,
   "routes": [
+    {
+      "src": "/admin.html",
+      "dest": "/admin.html"
+    },
     {
       "src": "/(.*)",
       "dest": "/index.html"

@@ -66,6 +66,23 @@
         .truncate { max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .truncate:hover { overflow:visible; white-space:normal; word-break:break-word; }
     </style>
+
+    <!-- ENVIRONMENT VARIABLES LOADER -->
+    <script>
+        // Load environment variables from Vercel
+        window.ENV = {
+            DATABASE_URL: '',
+            ADMIN_PASSWORD: 'sejutapohon2025'
+        };
+        
+        // Fallback untuk local development
+        if (window.ENV.DATABASE_URL === '') {
+            window.ENV.DATABASE_URL = '';
+        }
+        if (window.ENV.ADMIN_PASSWORD === 'sejutapohon2025') {
+            window.ENV.ADMIN_PASSWORD = '';
+        }
+    </script>
 </head>
 <body class="min-h-screen">
     <!-- Toast -->
@@ -249,8 +266,8 @@
 
         // --- CONFIGURATION ---
         const CONFIG = {
-            DB_URL: 'postgresql://neondb_owner:npg_2eWGNaKP8LZi@ep-crimson-tooth-a1xgngig-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require',
-            ADMIN_PASS: 'sejutapohon2025',
+            DB_URL: window.ENV?.DATABASE_URL || 'postgresql://neondb_owner:npg_2eWGNaKP8LZi@ep-crimson-tooth-a1xgngig-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require',
+            ADMIN_PASS: window.ENV?.ADMIN_PASSWORD || 'sejutapohon2025',
             SESSION_KEY: 'sp_admin_auth',
             SESSION_DURATION: 4 * 60 * 60 * 1000 // 4 hours
         };
