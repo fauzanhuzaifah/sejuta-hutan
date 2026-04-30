@@ -645,6 +645,80 @@
             visibility: visible !important;
             display: block !important;
         }
+
+        /* Override ekstrem untuk semua elemen reveal - prioritas tertinggi */
+        html:root body *:is(.reveal, .reveal-left, .reveal-right, .reveal.active, .reveal-left.active, .reveal-right.active) {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            transition: none !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+        }
+
+        /* Override spesifik untuk line 1103 */
+        .reveal, .reveal-left, .reveal-right { 
+            opacity: 1 !important; 
+        }
+        
+        /* Override untuk semua section yang menggunakan reveal */
+        section[id] .reveal,
+        section[id] h1.reveal,
+        section[id] h2.reveal, 
+        section[id] h3.reveal,
+        section[id] p.reveal,
+        section[id] div.reveal,
+        section[id] span.reveal {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* Override spesifik untuk form section - memastikan semua elemen form terlihat */
+        #form .reveal,
+        #form .reveal-left,
+        #form .reveal-right,
+        #form .reveal.active,
+        #form .reveal-left.active,
+        #form .reveal-right.active,
+        #form h2.reveal,
+        #form h3.reveal,
+        #form p.reveal,
+        #form div.reveal,
+        #form span.reveal,
+        #form label.reveal,
+        #form input.reveal,
+        #form select.reveal,
+        #form textarea.reveal,
+        #form button.reveal,
+        #form [data-i18n="form_motivasi"],
+        #form #f-motivasi {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        /* Override spesifik untuk textarea Motivasi Bergabung */
+        #form textarea[id="f-motivasi"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            min-height: 80px !important;
+        }
+
+        /* Override spesifik untuk label Motivasi Bergabung */
+        #form label[data-i18n="form_motivasi"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            color: #a7f3d0 !important;
+            font-weight: 600 !important;
+            margin-bottom: 8px !important;
+        }
         
         #dampak h2.reveal {
             font-size: 3rem !important;
