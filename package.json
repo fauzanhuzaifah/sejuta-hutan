@@ -2,13 +2,13 @@
   "name": "sejuta-pohon",
   "version": "1.0.0",
   "description": "Menanam Sejuta Pohon — Kota Lhokseumawe",
-  "main": "server.js",
+  "main": "index.html",
   "scripts": {
-    "start": "node server.js"
+    "dev": "npx serve -s .",
+    "build": "echo 'Static site - no build needed'",
+    "start": "npx serve -s . -l 3000"
   },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "pg": "^8.13.1"
+  "devDependencies": {
+    "serve": "^14.2.1"
   }
 }
