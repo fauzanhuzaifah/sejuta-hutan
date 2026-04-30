@@ -568,6 +568,64 @@
             visibility: visible !important;
             display: block !important;
         }
+
+        /* Override paling ekstrem - memaksa semua elemen terlihat */
+        html:root body * {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* Override spesifik untuk elemen yang benar-benar harus terlihat */
+        html:root body h1,
+        html:root body h2,
+        html:root body h3,
+        html:root body p,
+        html:root body span,
+        html:root body div,
+        html:root body label,
+        html:root body input,
+        html:root body select,
+        html:root body textarea,
+        html:root body button {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+        }
+
+        /* Override untuk hero title */
+        html:root body #hero h1,
+        html:root body .hero-title,
+        html:root body [data-i18n="hero_title"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            color: white !important;
+            font-size: 3rem !important;
+            font-weight: bold !important;
+        }
+
+        /* Override untuk Dampak Perubahan Iklim */
+        html:root body #dampak h2,
+        html:root body [data-i18n="dampak_title"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            color: #064e3b !important;
+            font-size: 2.5rem !important;
+            font-weight: bold !important;
+        }
+
+        /* Override untuk form Motivasi Bergabung */
+        html:root body #form label[data-i18n="form_motivasi"],
+        html:root body #form textarea#f-motivasi {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+            z-index: 999 !important;
+        }
         
         .reveal.active, .reveal-left.active, .reveal-right.active {
             opacity: 1 !important;
@@ -3291,5 +3349,71 @@ try {
 }
 </script>
 
+<script>
+    // Override paling ekstrem untuk memastikan semua elemen terlihat
+    (function() {
+        // Force all elements to be visible
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.opacity = '1';
+            el.style.visibility = 'visible';
+            el.style.display = 'block';
+        });
+        
+        // Force specific important elements
+        const heroTitle = document.querySelector('[data-i18n="hero_title"]');
+        if (heroTitle) {
+            heroTitle.style.opacity = '1';
+            heroTitle.style.visibility = 'visible';
+            heroTitle.style.display = 'block';
+            heroTitle.style.color = 'white';
+            heroTitle.style.fontSize = '3rem';
+            heroTitle.style.fontWeight = 'bold';
+        }
+        
+        const dampakTitle = document.querySelector('[data-i18n="dampak_title"]');
+        if (dampakTitle) {
+            dampakTitle.style.opacity = '1';
+            dampakTitle.style.visibility = 'visible';
+            dampakTitle.style.display = 'block';
+            dampakTitle.style.color = '#064e3b';
+            dampakTitle.style.fontSize = '2.5rem';
+            dampakTitle.style.fontWeight = 'bold';
+        }
+        
+        const motivasiLabel = document.querySelector('[data-i18n="form_motivasi"]');
+        const motivasiTextarea = document.getElementById('f-motivasi');
+        if (motivasiLabel) {
+            motivasiLabel.style.opacity = '1';
+            motivasiLabel.style.visibility = 'visible';
+            motivasiLabel.style.display = 'block';
+        }
+        if (motivasiTextarea) {
+            motivasiTextarea.style.opacity = '1';
+            motivasiTextarea.style.visibility = 'visible';
+            motivasiTextarea.style.display = 'block';
+        }
+        
+        // Force form section visibility
+        const formSection = document.getElementById('form');
+        if (formSection) {
+            const formElements = formSection.querySelectorAll('*');
+            formElements.forEach(el => {
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.display = 'block';
+            });
+        }
+        
+        // Repeat every second to ensure visibility
+        setInterval(() => {
+            allElements.forEach(el => {
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.display = 'block';
+            });
+        }, 1000);
+    })();
+</script>
 </body>
 </html>
