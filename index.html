@@ -34,11 +34,11 @@
         };
         
         // Fallback untuk local development
-        if (window.ENV.DATABASE_URL === '') {
-            window.ENV.DATABASE_URL = '';
+        if (window.ENV.DATABASE_URL === '' || !window.ENV.DATABASE_URL) {
+            window.ENV.DATABASE_URL = 'postgresql://neondb_owner:npg_2eWGNaKP8LZi@ep-crimson-tooth-a1xgngig-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
         }
-        if (window.ENV.ADMIN_PASSWORD === 'sejutapohon2025') {
-            window.ENV.ADMIN_PASSWORD = '';
+        if (window.ENV.ADMIN_PASSWORD === 'sejutapohon2025' || !window.ENV.ADMIN_PASSWORD) {
+            window.ENV.ADMIN_PASSWORD = 'sejutapohon2025';
         }
     </script>
 
