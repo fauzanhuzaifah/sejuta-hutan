@@ -584,7 +584,32 @@
         #dampak h2.reveal,
         #dampak p.reveal,
         #dampak div.reveal,
-        #dampak section.reveal {
+        #dampak section.reveal,
+        section .reveal,
+        section.reveal,
+        .reveal,
+        .reveal-left,
+        .reveal-right,
+        .reveal.active,
+        .reveal-left.active,
+        .reveal-right.active,
+        #hero .reveal,
+        #hero h1.reveal,
+        #hero p.reveal,
+        #hero span.reveal,
+        #hero div.reveal,
+        #form .reveal,
+        #form h2.reveal,
+        #form p.reveal,
+        #form div.reveal,
+        #tentang .reveal,
+        #tentang h2.reveal,
+        #tentang p.reveal,
+        #tentang div.reveal,
+        #progress .reveal,
+        #progress h2.reveal,
+        #progress p.reveal,
+        #progress div.reveal {
             opacity: 1 !important;
             transform: translateX(0) translateY(0) !important;
             transition: none !important;
@@ -598,6 +623,25 @@
         #dampak .reveal {
             opacity: 1 !important;
             transform: none !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* Override paling kuat untuk semua elemen reveal - GitHub Pages */
+        html:root body *:where(.reveal, .reveal-left, .reveal-right, .reveal.active, .reveal-left.active, .reveal-right.active) {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            transition: none !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        /* Override untuk conflicting CSS yang menetapkan opacity:0 */
+        .reveal:not(.active), .reveal-left:not(.active), .reveal-right:not(.active) {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
             visibility: visible !important;
             display: block !important;
         }
