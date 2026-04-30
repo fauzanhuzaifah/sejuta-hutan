@@ -10,6 +10,1168 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     
+<<<<<<< HEAD
+=======
+    <!-- FALLBACK JIKA TAILWIND GAGAL LOAD -->
+    <style>
+        /* Base styles untuk GitHub Pages */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #052e16;
+            color: #e8f5e9;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+        
+        /* Fallback untuk hero section */
+        .hero-bg {
+            background: linear-gradient(160deg, #052e16 0%, #0a3d1f 25%, #14532d 50%, #064e3b 75%, #052e16 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 30% 40%, rgba(34, 197, 94, 0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse 60% 50% at 70% 60%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+            z-index: 1;
+        }
+        
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to top, #052e16, transparent);
+            z-index: 2;
+        }
+        
+        /* Container styles */
+        .max-w-5xl {
+            max-width: 64rem;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        
+        .max-w-2xl {
+            max-width: 42rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Text styles */
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-forest-100 { color: #e8f5e9; }
+        .text-forest-300 { color: #86efac; }
+        .text-forest-400 { color: #4ade80; }
+        
+        /* Hero title styles */
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            line-height: 0.9;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .hero-title span {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-title span:last-child {
+            font-size: 1.875rem;
+            font-weight: 300;
+            margin-top: 0.5rem;
+            letter-spacing: 0.025em;
+        }
+        
+        /* Gradient text */
+        .text-transparent.bg-clip-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .bg-gradient-to-r {
+            background-image: linear-gradient(to right, #4ade80, #22c55e);
+        }
+        
+        .font-playfair {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+        }
+        
+        .glow-green {
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+        
+        /* Description text */
+        .hero-desc {
+            color: #4ade80;
+            font-size: 1rem;
+            max-width: 42rem;
+            margin: 0 auto 2.5rem;
+            line-height: 1.75;
+        }
+        
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(22, 163, 74, 0.4);
+        }
+        
+        .btn-secondary {
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(34, 197, 94, 0.1);
+        }
+        
+        /* Badge styles */
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            background: rgba(22, 101, 52, 0.4);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseDot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+        }
+        
+        .badge-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #86efac;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+                line-height: 1.1;
+            }
+            
+            .hero-title span:last-child {
+                font-size: 1.5rem;
+            }
+            
+            .hero-desc {
+                font-size: 0.875rem;
+                padding: 0 1rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Utility classes */
+        .relative { position: relative; }
+        .z-10 { z-index: 10; }
+        .pt-28 { padding-top: 7rem; }
+        .pb-32 { padding-bottom: 8rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-10 { margin-bottom: 2.5rem; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .flex-col { flex-direction: column; }
+        .gap-4 { gap: 1rem; }
+        .inline-flex { display: inline-flex; }
+        .gap-2 { gap: 0.5rem; }
+        .block { display: block; }
+        .w-5 { width: 1.25rem; }
+        .h-5 { height: 1.25rem; }
+        .text-base { font-size: 1rem; }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .font-light { font-weight: 300; }
+        .tracking-wide { letter-spacing: 0.025em; }
+        .tracking-tight { letter-spacing: -0.025em; }
+        .leading-relaxed { line-height: 1.75; }
+        .leading-\[0\.9\] { line-height: 0.9; }
+        .mt-2 { margin-top: 0.5rem; }
+        
+        /* Icon styles */
+        i[data-lucide] {
+            width: 1.25rem;
+            height: 1.25rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        /* Link styles */
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        /* Ensure hero title is visible */
+        .hero-title {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+        
+        .hero-title span {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+    </style>
+    
+    <!-- FALLBACK FONT UNTUK GITHUB PAGES -->
+    <style>
+        /* Fallback untuk font Playfair Display */
+        .font-playfair {
+            font-family: 'Playfair Display', Georgia, serif !important;
+        }
+        /* Fallback untuk font Inter */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        /* Fallback untuk gradient text */
+        .text-transparent.bg-clip-text {
+            background-clip: text !important;
+            -webkit-background-clip: text !important;
+            color: transparent !important;
+        }
+        /* Fallback untuk glow effect */
+        .glow-green {
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.3) !important;
+        }
+        /* Fallback untuk hero title visibility */
+        .hero-title {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+        /* Fallback untuk dark mode */
+        .dark body {
+            background: #052e16 !important;
+            color: #e8f5e9 !important;
+        }
+        /* Fallback untuk light mode */
+        .light-mode body {
+            background: #f0fdf4 !important;
+            color: #14532d !important;
+        }
+        /* Fallback untuk hero background */
+        .hero-bg {
+            background: linear-gradient(160deg, #052e16 0%, #0a3d1f 25%, #14532d 50%, #064e3b 75%, #052e16 100%) !important;
+            min-height: 100vh !important;
+        }
+        /* Fallback untuk text colors */
+        .text-forest-100 { color: #e8f5e9 !important; }
+        .text-forest-300 { color: #86efac !important; }
+        .text-forest-400 { color: #4ade80 !important; }
+        .text-forest-900 { color: #14532d !important; }
+        /* Fallback untuk light mode text colors */
+        .light-mode .text-forest-100,
+        .light-mode .text-forest-200,
+        .light-mode .hero-title { color: #14532d !important; }
+        .light-mode .text-forest-300 { color: #54745f !important; }
+        .light-mode .text-forest-700 { color: #15803d !important; }
+        
+        /* Fallback untuk gradient text di GitHub Pages */
+        .text-transparent.bg-clip-text.bg-gradient-to-r {
+            background-image: linear-gradient(135deg, #4ade80, #22c55e) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            color: transparent !important;
+        }
+        
+        /* Fallback untuk mobile */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem !important;
+                line-height: 1.1 !important;
+            }
+            .hero-title span {
+                display: block !important;
+                margin-bottom: 0.5rem !important;
+            }
+        }
+        
+        /* Fallback untuk section hero */
+        .hero-bg {
+            min-height: 100vh !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        /* Fallback untuk z-index */
+        .hero-bg .relative.z-10 {
+            z-index: 10 !important;
+            position: relative !important;
+        }
+        
+        /* Fallback untuk text alignment */
+        .text-center {
+            text-align: center !important;
+        }
+        
+        /* Fallback untuk block display */
+        .block {
+            display: block !important;
+        }
+        
+        /* Fallback untuk margin */
+        .mb-6 {
+            margin-bottom: 1.5rem !important;
+        }
+        .mb-8 {
+            margin-bottom: 2rem !important;
+        }
+        .mb-10 {
+            margin-bottom: 2.5rem !important;
+        }
+        
+        /* Fallback untuk padding */
+        .pt-28 {
+            padding-top: 7rem !important;
+        }
+        .pb-32 {
+            padding-bottom: 8rem !important;
+        }
+        
+        /* Fallback untuk max-width */
+        .max-w-5xl {
+            max-width: 64rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        
+        .max-w-2xl {
+            max-width: 42rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        
+        /* Fallback untuk flexbox */
+        .flex {
+            display: flex !important;
+        }
+        .items-center {
+            align-items: center !important;
+        }
+        .justify-center {
+            justify-content: center !important;
+        }
+        .flex-col {
+            flex-direction: column !important;
+        }
+        .sm\\:flex-row {
+            flex-direction: row !important;
+        }
+        .gap-4 {
+            gap: 1rem !important;
+        }
+        
+        /* Fallback untuk button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #16a34a, #15803d) !important;
+            color: white !important;
+            padding: 1rem 2rem !important;
+            border-radius: 1rem !important;
+            font-weight: 700 !important;
+            font-size: 1rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 10px 30px rgba(22, 163, 74, 0.4) !important;
+        }
+        
+        /* Fallback untuk link styles */
+        a[href^="#"] {
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+        
+        /* Fallback untuk icon */
+        i[data-lucide] {
+            width: 1.25rem !important;
+            height: 1.25rem !important;
+            display: inline-block !important;
+            vertical-align: middle !important;
+        }
+        
+        /* Fallback untuk pulse dot */
+        .pulse-dot {
+            width: 8px !important;
+            height: 8px !important;
+            border-radius: 50% !important;
+            background: #22c55e !important;
+            animation: pulseDot 2s ease-in-out infinite !important;
+        }
+        
+        @keyframes pulseDot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4) !important; }
+            50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0) !important; }
+        }
+        
+        /* Fallback untuk uppercase text */
+        .uppercase {
+            text-transform: uppercase !important;
+        }
+        .tracking-wider {
+            letter-spacing: 0.05em !important;
+        }
+        .text-xs {
+            font-size: 0.75rem !important;
+            line-height: 1rem !important;
+        }
+        .font-semibold {
+            font-weight: 600 !important;
+        }
+        
+        /* Fallback untuk rounded elements */
+        .rounded-full {
+            border-radius: 9999px !important;
+        }
+        .rounded-2xl {
+            border-radius: 1rem !important;
+        }
+        
+        /* Fallback untuk backdrop blur */
+        .backdrop-blur-sm {
+            backdrop-filter: blur(4px) !important;
+            -webkit-backdrop-filter: blur(4px) !important;
+        }
+        
+        /* Fallback untuk border */
+        .border {
+            border-width: 1px !important;
+            border-style: solid !important;
+        }
+        .border-forest-600\/20 {
+            border-color: rgba(34, 197, 94, 0.2) !important;
+        }
+        
+        /* Fallback untuk background */
+        .bg-forest-800\/40 {
+            background-color: rgba(22, 101, 52, 0.4) !important;
+        }
+        
+        /* Fallback untuk inline-flex */
+        .inline-flex {
+            display: inline-flex !important;
+        }
+        .gap-2 {
+            gap: 0.5rem !important;
+        }
+        
+        /* Fallback untuk text color */
+        .text-forest-300 {
+            color: #86efac !important;
+        }
+        .light-mode .text-green-800 {
+            color: #166534 !important;
+        }
+        
+        /* Fallback untuk light mode */
+        .light-mode {
+            background: #f0fdf4 !important;
+            color: #14532d !important;
+        }
+        .light-mode .hero-bg {
+            background: linear-gradient(160deg, #f0fdf4 0%, #dcfce7 25%, #bbf7d0 50%, #a7f3d0 75%, #f0fdf4 100%) !important;
+        }
+        
+        /* Fallback untuk reveal animation - GitHub Pages */
+        .reveal, .reveal-left, .reveal-right {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            transition: none !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* Override paling ekstrem - memaksa semua elemen terlihat */
+        html:root body * {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* Override spesifik untuk elemen yang benar-benar harus terlihat */
+        html:root body h1,
+        html:root body h2,
+        html:root body h3,
+        html:root body p,
+        html:root body span,
+        html:root body div,
+        html:root body label,
+        html:root body input,
+        html:root body select,
+        html:root body textarea,
+        html:root body button {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+        }
+
+        /* Override untuk hero title */
+        html:root body #hero h1,
+        html:root body .hero-title,
+        html:root body [data-i18n="hero_title"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            color: white !important;
+            font-size: 3rem !important;
+            font-weight: bold !important;
+        }
+
+        /* Override untuk Dampak Perubahan Iklim */
+        html:root body #dampak h2,
+        html:root body [data-i18n="dampak_title"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            color: #064e3b !important;
+            font-size: 2.5rem !important;
+            font-weight: bold !important;
+        }
+
+        /* Override untuk form Motivasi Bergabung */
+        html:root body #form label[data-i18n="form_motivasi"],
+        html:root body #form textarea#f-motivasi {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+            z-index: 999 !important;
+        }
+        
+        .reveal.active, .reveal-left.active, .reveal-right.active {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+        
+        /* Override final untuk conflicting reveal CSS - GitHub Pages */
+        html body .reveal,
+        html body .reveal-left,
+        html body .reveal-right,
+        #dampak .reveal,
+        #dampak h2.reveal,
+        #dampak p.reveal,
+        #dampak div.reveal,
+        #dampak section.reveal,
+        section .reveal,
+        section.reveal,
+        .reveal,
+        .reveal-left,
+        .reveal-right,
+        .reveal.active,
+        .reveal-left.active,
+        .reveal-right.active,
+        #hero .reveal,
+        #hero h1.reveal,
+        #hero p.reveal,
+        #hero span.reveal,
+        #hero div.reveal,
+        #form .reveal,
+        #form h2.reveal,
+        #form p.reveal,
+        #form div.reveal,
+        #tentang .reveal,
+        #tentang h2.reveal,
+        #tentang p.reveal,
+        #tentang div.reveal,
+        #progress .reveal,
+        #progress h2.reveal,
+        #progress p.reveal,
+        #progress div.reveal {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            transition: none !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        /* Fallback khusus untuk section dampak */
+        #dampak .reveal {
+            opacity: 1 !important;
+            transform: none !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* Override paling kuat untuk semua elemen reveal - GitHub Pages */
+        html:root body *:where(.reveal, .reveal-left, .reveal-right, .reveal.active, .reveal-left.active, .reveal-right.active) {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            transition: none !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        /* Override untuk conflicting CSS yang menetapkan opacity:0 */
+        .reveal:not(.active), .reveal-left:not(.active), .reveal-right:not(.active) {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* Override ekstrem untuk semua elemen reveal - prioritas tertinggi */
+        html:root body *:is(.reveal, .reveal-left, .reveal-right, .reveal.active, .reveal-left.active, .reveal-right.active) {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            transition: none !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+        }
+
+        /* Override spesifik untuk line 1103 */
+        .reveal, .reveal-left, .reveal-right { 
+            opacity: 1 !important; 
+        }
+        
+        /* Override untuk semua section yang menggunakan reveal */
+        section[id] .reveal,
+        section[id] h1.reveal,
+        section[id] h2.reveal, 
+        section[id] h3.reveal,
+        section[id] p.reveal,
+        section[id] div.reveal,
+        section[id] span.reveal {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* Override spesifik untuk form section - memastikan semua elemen form terlihat */
+        #form .reveal,
+        #form .reveal-left,
+        #form .reveal-right,
+        #form .reveal.active,
+        #form .reveal-left.active,
+        #form .reveal-right.active,
+        #form h2.reveal,
+        #form h3.reveal,
+        #form p.reveal,
+        #form div.reveal,
+        #form span.reveal,
+        #form label.reveal,
+        #form input.reveal,
+        #form select.reveal,
+        #form textarea.reveal,
+        #form button.reveal,
+        #form [data-i18n="form_motivasi"],
+        #form #f-motivasi {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) !important;
+            visibility: visible !important;
+            display: block !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        /* Override spesifik untuk textarea Motivasi Bergabung */
+        #form textarea[id="f-motivasi"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            min-height: 80px !important;
+        }
+
+        /* Override spesifik untuk label Motivasi Bergabung */
+        #form label[data-i18n="form_motivasi"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            color: #a7f3d0 !important;
+            font-weight: 600 !important;
+            margin-bottom: 8px !important;
+        }
+        
+        #dampak h2.reveal {
+            font-size: 3rem !important;
+            font-weight: 800 !important;
+            color: #e8f5e9 !important;
+            margin-bottom: 1rem !important;
+            text-align: center !important;
+        }
+        
+        #dampak .text-transparent.bg-clip-text {
+            background-image: linear-gradient(to right, #f87171, #fbbf24) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            color: transparent !important;
+        }
+        
+        #dampak p.reveal {
+            color: #4ade80 !important;
+            text-align: center !important;
+            max-width: 42rem !important;
+            margin: 0 auto 4rem !important;
+            line-height: 1.75 !important;
+        }
+        
+        /* Fallback untuk section dampak */
+        #dampak {
+            padding: 6rem 0 !important;
+            background: #052e16 !important;
+        }
+        
+        .light-mode #dampak {
+            background: white !important;
+            color: #14532d !important;
+        }
+        
+        /* Fallback untuk text colors di section dampak */
+        .text-red-400\/80 {
+            color: rgba(248, 113, 113, 0.8) !important;
+        }
+        
+        .light-mode .text-red-400\/80 {
+            color: rgba(220, 38, 38, 0.8) !important;
+        }
+        
+        .text-forest-100 {
+            color: #e8f5e9 !important;
+        }
+        
+        .light-mode .text-forest-100 {
+            color: #14532d !important;
+        }
+        
+        .text-forest-400 {
+            color: #4ade80 !important;
+        }
+        
+        .light-mode .text-forest-400 {
+            color: #166534 !important;
+        }
+        
+        /* Fallback untuk gradient text */
+        .text-transparent.bg-clip-text.bg-gradient-to-r.from-red-400.to-amber-400 {
+            background-image: linear-gradient(to right, #f87171, #f59e0b) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            color: transparent !important;
+        }
+        
+        /* Fallback untuk grid layout */
+        .grid {
+            display: grid !important;
+        }
+        
+        .md\\:grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+        
+        .lg\\:grid-cols-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        }
+        
+        .gap-6 {
+            gap: 1.5rem !important;
+        }
+        
+        /* Fallback untuk cards */
+        .bg-gradient-to-br {
+            background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)) !important;
+        }
+        
+        .from-forest-900\/60 {
+            background-color: rgba(22, 101, 52, 0.6) !important;
+        }
+        
+        .to-forest-950 {
+            background-color: #052e16 !important;
+        }
+        
+        .border-forest-700\/30 {
+            border-color: rgba(34, 197, 94, 0.3) !important;
+        }
+        
+        .rounded-2xl {
+            border-radius: 1rem !important;
+        }
+        
+        .p-7 {
+            padding: 1.75rem !important;
+        }
+        
+        /* Fallback untuk light mode cards */
+        .light-mode .bg-gradient-to-br.from-forest-900\/60 {
+            background-color: rgba(254, 226, 226, 0.5) !important;
+            background-image: none !important;
+        }
+        
+        .light-mode .to-forest-950 {
+            background-color: #fef2f2 !important;
+        }
+        
+        .light-mode .border-forest-700\/30 {
+            border-color: rgba(252, 165, 165, 0.5) !important;
+        }
+        
+        /* Fallback untuk icon colors */
+        .text-red-400 {
+            color: #f87171 !important;
+        }
+        
+        .text-blue-400 {
+            color: #60a5fa !important;
+        }
+        
+        .text-amber-400 {
+            color: #f59e0b !important;
+        }
+        
+        /* Fallback untuk card titles */
+        .text-forest-800 {
+            color: #166534 !important;
+        }
+        
+        .light-mode .text-forest-800 {
+            color: #14532d !important;
+        }
+        
+        /* Fallback untuk card descriptions */
+        .text-forest-500 {
+            color: #22c55e !important;
+        }
+        
+        .light-mode .text-forest-500 {
+            color: #16a34a !important;
+        }
+        
+        .text-forest-600 {
+            color: #16a34a !important;
+        }
+        
+        .light-mode .text-forest-600 {
+            color: #15803d !important;
+        }
+        
+        /* Fallback untuk section background */
+        .bg-forest-950 {
+            background-color: #052e16 !important;
+        }
+        
+        .light-mode.bg-white {
+            background-color: white !important;
+        }
+        
+        /* Fallback untuk max-w-6xl */
+        .max-w-6xl {
+            max-width: 72rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        
+        /* Fallback untuk py-24 */
+        .py-24 {
+            padding-top: 6rem !important;
+            padding-bottom: 6rem !important;
+        }
+        
+        /* Fallback untuk mb-16 */
+        .mb-16 {
+            margin-bottom: 4rem !important;
+        }
+        
+        /* Fallback untuk block display */
+        .block {
+            display: block !important;
+        }
+        
+        /* Fallback untuk uppercase */
+        .uppercase {
+            text-transform: uppercase !important;
+        }
+        
+        /* Fallback untuk tracking */
+        .tracking-\[0\.2em\] {
+            letter-spacing: 0.2em !important;
+        }
+        
+        .tracking-tight {
+            letter-spacing: -0.025em !important;
+        }
+        
+        /* Fallback untuk text sizes */
+        .text-3xl {
+            font-size: 1.875rem !important;
+            line-height: 2.25rem !important;
+        }
+        
+        .md\\:text-5xl {
+            font-size: 3rem !important;
+            line-height: 1 !important;
+        }
+        
+        .text-xs {
+            font-size: 0.75rem !important;
+            line-height: 1rem !important;
+        }
+        
+        .text-sm {
+            font-size: 0.875rem !important;
+            line-height: 1.25rem !important;
+        }
+        
+        .text-base {
+            font-size: 1rem !important;
+            line-height: 1.5rem !important;
+        }
+        
+        /* Fallback untuk font weights */
+        .font-bold {
+            font-weight: 700 !important;
+        }
+        
+        .font-semibold {
+            font-weight: 600 !important;
+        }
+        
+        .font-extrabold {
+            font-weight: 800 !important;
+        }
+        
+        /* Fallback untuk leading */
+        .leading-relaxed {
+            line-height: 1.75 !important;
+        }
+        
+        /* Fallback untuk margin bottom */
+        .mb-4 {
+            margin-bottom: 1rem !important;
+        }
+        
+        .mb-5 {
+            margin-bottom: 1.25rem !important;
+        }
+        
+        .mb-2 {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Fallback untuk flexbox */
+        .flex {
+            display: flex !important;
+        }
+        
+        .items-center {
+            align-items: center !important;
+        }
+        
+        .justify-center {
+            justify-content: center !important;
+        }
+        
+        /* Fallback untuk icon sizes */
+        .w-12 {
+            width: 3rem !important;
+        }
+        
+        .h-12 {
+            height: 3rem !important;
+        }
+        
+        .w-6 {
+            width: 1.5rem !important;
+        }
+        
+        .h-6 {
+            height: 1.5rem !important;
+        }
+        
+        /* Fallback untuk rounded */
+        .rounded-xl {
+            border-radius: 0.75rem !important;
+        }
+        
+        /* Fallback untuk background colors */
+        .bg-red-950\/50 {
+            background-color: rgba(76, 5, 25, 0.5) !important;
+        }
+        
+        .bg-blue-950\/50 {
+            background-color: rgba(23, 37, 84, 0.5) !important;
+        }
+        
+        .bg-amber-950\/50 {
+            background-color: rgba(69, 26, 3, 0.5) !important;
+        }
+        
+        .bg-purple-950\/50 {
+            background-color: rgba(88, 28, 135, 0.5) !important;
+        }
+        
+        /* Fallback untuk border colors */
+        .border-red-800\/20 {
+            border-color: rgba(153, 27, 27, 0.2) !important;
+        }
+        
+        .border-blue-800\/20 {
+            border-color: rgba(30, 64, 175, 0.2) !important;
+        }
+        
+        .border-amber-800\/20 {
+            border-color: rgba(146, 64, 14, 0.2) !important;
+        }
+        
+        .border-purple-800\/20 {
+            border-color: rgba(107, 33, 168, 0.2) !important;
+        }
+        
+        /* Fallback untuk hover effects */
+        .hover\:border-red-500\/30:hover {
+            border-color: rgba(239, 68, 68, 0.3) !important;
+        }
+        
+        .hover\:border-blue-500\/30:hover {
+            border-color: rgba(59, 130, 246, 0.3) !important;
+        }
+        
+        .hover\:border-amber-500\/30:hover {
+            border-color: rgba(245, 158, 11, 0.3) !important;
+        }
+        
+        .hover\:border-purple-500\/30:hover {
+            border-color: rgba(168, 85, 247, 0.3) !important;
+        }
+        
+        /* Fallback untuk transition */
+        .transition-all {
+            transition: all 0.3s ease !important;
+        }
+        
+        /* Fallback untuk light mode card backgrounds */
+        .light-mode .bg-red-50\/50 {
+            background-color: rgba(254, 226, 226, 0.5) !important;
+        }
+        
+        .light-mode .bg-blue-50\/50 {
+            background-color: rgba(239, 246, 255, 0.5) !important;
+        }
+        
+        .light-mode .bg-amber-50\/50 {
+            background-color: rgba(254, 243, 199, 0.5) !important;
+        }
+        
+        .light-mode .bg-purple-50\/50 {
+            background-color: rgba(250, 245, 255, 0.5) !important;
+        }
+        
+        /* Fallback untuk light mode card borders */
+        .light-mode .border-red-200 {
+            border-color: #fecaca !important;
+        }
+        
+        .light-mode .border-blue-200 {
+            border-color: #bfdbfe !important;
+        }
+        
+        .light-mode .border-amber-200 {
+            border-color: #fde68a !important;
+        }
+        
+        .light-mode .border-purple-200 {
+            border-color: #e9d5ff !important;
+        }
+    </style>
+    
+>>>>>>> 96ccd972f012685a9107a15b06b0bddd68c6e8ce
     <!-- KONFIGURASI TAILWIND -->
     <script>
         tailwind.config = {
@@ -462,6 +1624,26 @@
     </div>
 </section>
 
+<<<<<<< HEAD
+=======
+<!-- FALLBACK JUDUL UNTUK GITHUB PAGES (NOSCRIPT) -->
+<noscript>
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(160deg, #052e16 0%, #0a3d1f 100%); padding: 3rem; border-radius: 1rem; text-align: center; max-width: 90%; z-index: 9999; border: 2px solid #22c55e;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; color: #e8f5e9;">
+            <span style="display: block;">Menanam</span>
+            <span style="display: block; font-style: italic; background: linear-gradient(135deg, #4ade80, #22c55e); -webkit-background-clip: text; background-clip: text; color: transparent;">Sejuta Pohon</span>
+            <span style="display: block; font-size: 1.5rem; font-weight: 300; margin-top: 0.5rem; color: #86efac;">Kota Lhokseumawe</span>
+        </h1>
+        <p style="color: #4ade80; margin-bottom: 1.5rem; line-height: 1.6;">Gerakan bersama menyelamatkan bumi dari krisis iklim, satu pohon pada satu waktu.</p>
+        <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+            <a href="#form" style="background: linear-gradient(135deg, #16a34a, #15803d); color: white; padding: 1rem 2rem; border-radius: 1rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">Daftar Sebagai Relawan</a>
+            <a href="#tentang" style="padding: 1rem 2rem; border-radius: 1rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(34, 197, 94, 0.3); color: #86efac;">Pelajari Lebih Lanjut</a>
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.875rem; color: #86efac; opacity: 0.8;">⚠️ JavaScript dinonaktifkan. Beberapa fitur mungkin tidak berfungsi.</p>
+    </div>
+</noscript>
+
+>>>>>>> 96ccd972f012685a9107a15b06b0bddd68c6e8ce
 <!-- BAGIAN: STATS -->
 <section class="relative py-16 bg-forest-950 -mt-1 light-mode:bg-green-50/50">
     <div class="max-w-6xl mx-auto px-6">
@@ -747,10 +1929,13 @@
                         </div>
 
                         <div>
+<<<<<<< HEAD
                             <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_motivasi">Motivasi Bergabung *</label>
                             <textarea id="f-motivasi" rows="3" required class="form-input w-full px-4 py-3 rounded-xl text-sm resize-none" placeholder="Apa alasan Anda ingin menanam pohon?"></textarea>
                         </div>
                         <div>
+=======
+>>>>>>> 96ccd972f012685a9107a15b06b0bddd68c6e8ce
                             <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_wa">No. WhatsApp *</label>
                             <input type="tel" id="f-wa" required class="form-input w-full px-4 py-3 rounded-xl text-sm">
                         </div>
@@ -795,6 +1980,13 @@
                             <option value="1000">1.000 Pohon (Institusi)</option>
                         </select>
                     </div>
+<<<<<<< HEAD
+=======
+                    <div>
+                        <label class="block text-xs font-semibold text-forest-400 mb-2 tracking-wider uppercase light-mode:text-forest-700" data-i18n="form_motivasi">Motivasi Bergabung *</label>
+                        <textarea id="f-motivasi" rows="3" required class="form-input w-full px-4 py-3 rounded-xl text-sm resize-none" placeholder="Apa alasan Anda ingin menanam pohon?"></textarea>
+                    </div>
+>>>>>>> 96ccd972f012685a9107a15b06b0bddd68c6e8ce
                     <button type="submit" id="submit-btn" class="btn-primary w-full px-8 py-4 rounded-2xl font-bold text-white text-base flex items-center gap-2 justify-center">
                         <i data-lucide="send" class="w-5 h-5"></i>
                         <span data-i18n="form_submit">Daftar Sebagai Relawan</span>
@@ -2090,11 +3282,163 @@ App.Comments = {
 // --- Expose App globally for onclick handlers ---
 window.App = App;
 
+<<<<<<< HEAD
 // --- START APPLICATION ---
 App.I18n.init();
 App.UI.init();
 App.Comments.init();
 </script>
 
+=======
+// --- FALLBACK JUDUL UNTUK GITHUB PAGES ---
+// Memastikan judul muncul bahkan jika ada error
+function ensureHeroTitleVisible() {
+    try {
+        const heroTitle = document.querySelector('.hero-title');
+        const heroLine1 = document.querySelector('[data-i18n="hero_line1"]');
+        const heroLine2 = document.querySelector('[data-i18n="hero_line2"]');
+        const heroLine3 = document.querySelector('[data-i18n="hero_line3"]');
+        
+        if (heroTitle) {
+            heroTitle.style.opacity = '1';
+            heroTitle.style.visibility = 'visible';
+            heroTitle.style.display = 'block';
+        }
+        
+        // Fallback text untuk judul
+        if (heroLine1 && !heroLine1.textContent.trim()) {
+            heroLine1.textContent = 'Menanam';
+        }
+        if (heroLine2 && !heroLine2.textContent.trim()) {
+            heroLine2.textContent = 'Sejuta Pohon';
+            heroLine2.style.fontFamily = 'Georgia, serif';
+            heroLine2.style.fontStyle = 'italic';
+            heroLine2.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
+            heroLine2.style.webkitBackgroundClip = 'text';
+            heroLine2.style.backgroundClip = 'text';
+            heroLine2.style.color = 'transparent';
+        }
+        if (heroLine3 && !heroLine3.textContent.trim()) {
+            heroLine3.textContent = 'Kota Lhokseumawe';
+        }
+        
+        console.log('✅ Hero title fallback applied successfully');
+    } catch (error) {
+        console.log('⚠️ Hero title fallback error:', error);
+    }
+}
+
+// --- FALLBACK REVEAL ANIMATION UNTUK GITHUB PAGES ---
+// Memastikan semua elemen reveal tetap terlihat
+function ensureRevealElementsVisible() {
+    try {
+        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        
+        revealElements.forEach(element => {
+            element.style.opacity = '1';
+            element.style.transform = 'translateX(0) translateY(0)';
+            element.style.visibility = 'visible';
+            element.style.display = 'block';
+            
+            // Tambahkan class active sebagai fallback
+            element.classList.add('active');
+        });
+        
+        console.log(`✅ Reveal elements fallback applied to ${revealElements.length} elements`);
+    } catch (error) {
+        console.log('⚠️ Reveal elements fallback error:', error);
+    }
+}
+
+// --- START APPLICATION ---
+try {
+    App.I18n.init();
+    App.UI.init();
+    App.Comments.init();
+    
+    // Terapkan fallback setelah inisialisasi
+    setTimeout(ensureHeroTitleVisible, 100);
+    setTimeout(ensureRevealElementsVisible, 100);
+    
+    // Terapkan fallback lagi setelah 1 detik untuk memastikan
+    setTimeout(ensureHeroTitleVisible, 1000);
+    setTimeout(ensureRevealElementsVisible, 1000);
+    
+    console.log('✅ Application initialized successfully');
+} catch (error) {
+    console.error('❌ Application initialization error:', error);
+    // Terapkan fallback bahkan jika ada error
+    ensureHeroTitleVisible();
+    ensureRevealElementsVisible();
+}
+</script>
+
+<script>
+    // Override paling ekstrem untuk memastikan semua elemen terlihat
+    (function() {
+        // Force all elements to be visible
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.opacity = '1';
+            el.style.visibility = 'visible';
+            el.style.display = 'block';
+        });
+        
+        // Force specific important elements
+        const heroTitle = document.querySelector('[data-i18n="hero_title"]');
+        if (heroTitle) {
+            heroTitle.style.opacity = '1';
+            heroTitle.style.visibility = 'visible';
+            heroTitle.style.display = 'block';
+            heroTitle.style.color = 'white';
+            heroTitle.style.fontSize = '3rem';
+            heroTitle.style.fontWeight = 'bold';
+        }
+        
+        const dampakTitle = document.querySelector('[data-i18n="dampak_title"]');
+        if (dampakTitle) {
+            dampakTitle.style.opacity = '1';
+            dampakTitle.style.visibility = 'visible';
+            dampakTitle.style.display = 'block';
+            dampakTitle.style.color = '#064e3b';
+            dampakTitle.style.fontSize = '2.5rem';
+            dampakTitle.style.fontWeight = 'bold';
+        }
+        
+        const motivasiLabel = document.querySelector('[data-i18n="form_motivasi"]');
+        const motivasiTextarea = document.getElementById('f-motivasi');
+        if (motivasiLabel) {
+            motivasiLabel.style.opacity = '1';
+            motivasiLabel.style.visibility = 'visible';
+            motivasiLabel.style.display = 'block';
+        }
+        if (motivasiTextarea) {
+            motivasiTextarea.style.opacity = '1';
+            motivasiTextarea.style.visibility = 'visible';
+            motivasiTextarea.style.display = 'block';
+        }
+        
+        // Force form section visibility
+        const formSection = document.getElementById('form');
+        if (formSection) {
+            const formElements = formSection.querySelectorAll('*');
+            formElements.forEach(el => {
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.display = 'block';
+            });
+        }
+        
+        // Repeat every second to ensure visibility
+        setInterval(() => {
+            allElements.forEach(el => {
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.display = 'block';
+            });
+        }, 1000);
+    })();
+</script>
+>>>>>>> 96ccd972f012685a9107a15b06b0bddd68c6e8ce
 </body>
 </html>
