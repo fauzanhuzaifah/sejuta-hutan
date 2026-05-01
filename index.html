@@ -59,41 +59,6 @@
         /* --- 2. Layout Dasar (Dark Mode Default) --- */
         body { font-family:'Inter','Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#052e16; color:#e8f5e9; overflow-x:hidden; }
         
-        /* --- 2A. Motif Background Modern & Profesional --- */
-        .bg-pattern {
-            position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; opacity:0.03;
-            background-image: 
-                radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(34, 197, 94, 0.06) 0%, transparent 50%);
-            animation: bgFloat 20s ease-in-out infinite;
-        }
-        @keyframes bgFloat {
-            0%, 100% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-20px) scale(1.02); }
-        }
-        
-        .bg-grid {
-            position:fixed; top:0; left:0; width:100%; height:100%; z-index:-2;
-            background-image: 
-                linear-gradient(rgba(34, 197, 94, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34, 197, 94, 0.02) 1px, transparent 1px);
-            background-size: 60px 60px;
-            animation: gridPulse 15s ease-in-out infinite;
-        }
-        @keyframes gridPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
-        }
-        
-        .bg-organic {
-            position:fixed; top:0; left:0; width:100%; height:100%; z-index:-3;
-            background: 
-                radial-gradient(ellipse at top left, rgba(5, 46, 22, 0.8) 0%, transparent 70%),
-                radial-gradient(ellipse at bottom right, rgba(15, 64, 30, 0.6) 0%, transparent 70%),
-                radial-gradient(ellipse at center, rgba(22, 101, 52, 0.4) 0%, transparent 70%);
-        }
-        
         /* Font fallback untuk Playfair Display */
         .font-playfair { font-family:'Playfair Display','Georgia','Times New Roman',serif !important; }
         
@@ -125,31 +90,6 @@
             left: 100%;
         }
         
-        /* --- 3A. Glassmorphism Modern --- */
-        .glass-card {
-            background: rgba(22, 101, 52, 0.25);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(34, 197, 94, 0.18);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: all 0.3s ease;
-        }
-        .glass-card:hover {
-            background: rgba(22, 101, 52, 0.35);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
-        }
-        
-        .glass-section {
-            background: linear-gradient(135deg, rgba(5, 46, 22, 0.6), rgba(15, 64, 30, 0.4));
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 20px;
-            border: 1px solid rgba(34, 197, 94, 0.15);
-            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-        }
-        
         /* --- 4. Navigasi & Glassmorphism --- */
         /* Tambahkan ini pada .nav-blur di dalam style */
         .nav-blur {
@@ -167,58 +107,6 @@
         /* --- 5. Efek Animasi --- */
         .leaf { position:fixed; top:-60px; z-index:0; pointer-events:none; animation:leafFall linear infinite; opacity:0.4; }
         @keyframes leafFall { 0%{transform:translateY(-60px) rotate(0deg) translateX(0); opacity:0;} 10%{opacity:0.5;} 90%{opacity:0.3;} 100%{transform:translateY(110vh) rotate(720deg) translateX(80px); opacity:0;} }
-        
-        /* --- 5B. Parallax Scrolling Modern --- */
-        .parallax-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -4;
-            background: linear-gradient(45deg, rgba(5, 46, 22, 0.1), rgba(15, 64, 30, 0.05));
-            transform: translateZ(0);
-            will-change: transform;
-        }
-        
-        .parallax-element {
-            transition: transform 0.1s ease-out;
-            will-change: transform;
-        }
-        
-        /* --- 5A. Partikel Energi Modern --- */
-        .energy-particle {
-            position: fixed;
-            width: 2px;
-            height: 2px;
-            background: linear-gradient(45deg, #22c55e, #16a34a);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: energyFlow 15s linear infinite;
-            box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
-        }
-        @keyframes energyFlow {
-            0% { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
-            10% { transform: translateY(90vh) translateX(20px) scale(1); opacity: 1; }
-            90% { transform: translateY(10vh) translateX(-30px) scale(1); opacity: 0.8; }
-            100% { transform: translateY(-10vh) translateX(50px) scale(0); opacity: 0; }
-        }
-        
-        .glow-orb {
-            position: fixed;
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: orbFloat 25s ease-in-out infinite;
-            filter: blur(2px);
-        }
-        @keyframes orbFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(100px, -50px) scale(1.2); }
-            66% { transform: translate(-80px, 30px) scale(0.8); }
-        }
         
         .reveal, .reveal-left, .reveal-right { opacity:0; transition:all 0.8s cubic-bezier(0.16,1,0.3,1); }
         .reveal.active, .reveal-left.active, .reveal-right.active { opacity:1; transform:translateX(0) translateY(0); }
@@ -491,85 +379,13 @@
             color: white;
             font-weight: 600;
         }
-        
-        /* --- LOADING EFFECTS --- */
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(5, 46, 22, 0.95);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        .loading-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            position: relative;
-        }
-        .loading-spinner::before,
-        .loading-spinner::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            animation: loadingPulse 2s ease-in-out infinite;
-        }
-        .loading-spinner::before {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(45deg, #22c55e, #16a34a);
-            animation-delay: 0s;
-        }
-        .loading-spinner::after {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(45deg, #16a34a, #15803d);
-            top: 10px;
-            left: 10px;
-            animation-delay: 1s;
-        }
-        @keyframes loadingPulse {
-            0%, 100% { transform: scale(0.8); opacity: 0.7; }
-            50% { transform: scale(1.2); opacity: 1; }
-        }
-        .loading-text {
-            position: absolute;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #86efac;
-            font-size: 14px;
-            font-weight: 500;
-            animation: loadingText 2s ease-in-out infinite;
-        }
-        @keyframes loadingText {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
     </style>
 </head>
 <body>
 
-<!-- Loading Overlay -->
-<div class="loading-overlay" id="loading-overlay">
-    <div class="loading-spinner">
-        <div class="loading-text" data-i18n="loading_text">Memuat Gerakan Sejuta Pohon...</div>
-    </div>
-</div>
 
-<!-- BACKGROUND MODERN & PROFESIONAL -->
-<div class="bg-organic"></div>
-<div class="bg-grid"></div>
-<div class="bg-pattern"></div>
-<div class="parallax-bg"></div>
 
-<!-- CONTAINER PARTIKEL DAUN -->
-<div id="leaves-container"></div>
+
 
 <!-- KOMPONEN: TOAST NOTIFIKASI -->
 <div id="toast" class="toast">
@@ -2001,23 +1817,7 @@ window.closeDetail = function() {
     }, 300);
 }
 
-// --- DYNAMIC PARTICLE GENERATOR ---
-document.addEventListener('DOMContentLoaded', () => {
-    const createParticles = (count, className) => {
-        const container = document.body;
-        for (let i = 0; i < count; i++) {
-            const particle = document.createElement('div');
-            particle.className = className;
-            particle.style.left = `${Math.random() * 100}vw`;
-            particle.style.animationDelay = `${Math.random() * 15}s`;
-            container.appendChild(particle);
-        }
-    };
-    
-    // Create energy particles and glow orbs
-    createParticles(20, 'energy-particle');
-    createParticles(3, 'glow-orb');
-});
+
 
 // --- PARALLAX SCROLLING EFFECT ---
 document.addEventListener('DOMContentLoaded', () => {
