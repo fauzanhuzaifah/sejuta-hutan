@@ -76,19 +76,6 @@
         
         .btn-primary { background:linear-gradient(135deg,#16a34a,#15803d); position:relative; overflow:hidden; transition:all 0.3s ease; }
         .btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(22,163,74,0.4); }
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.6s ease;
-        }
-        .btn-primary:hover::before {
-            left: 100%;
-        }
         
         /* --- 4. Navigasi & Glassmorphism --- */
         /* Tambahkan ini pada .nav-blur di dalam style */
@@ -383,9 +370,8 @@
 </head>
 <body>
 
-
-
-
+<!-- CONTAINER PARTIKEL DAUN -->
+<div id="leaves-container"></div>
 
 <!-- KOMPONEN: TOAST NOTIFIKASI -->
 <div id="toast" class="toast">
@@ -473,7 +459,7 @@
 </nav>
 
 <!-- BAGIAN: HERO -->
-<section class="hero-bg flex items-center justify-center relative overflow-hidden parallax-element">
+<section class="hero-bg flex items-center justify-center relative overflow-hidden">
     <div class="max-w-5xl mx-auto px-6 text-center relative z-10 pt-28 pb-32">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest-800/40 border border-forest-600/20 mb-8 backdrop-blur-sm">
             <div class="pulse-dot"></div>
@@ -528,7 +514,7 @@
 <div class="section-divider"></div>
 
 <!-- BAGIAN: TENTANG, DAMPAK, MANFAAT (Disingkat untuk efisiensi, konten tetap sama) -->
-<section id="tentang" class="py-24 bg-forest-950 light-mode:bg-white relative overflow-hidden parallax-element">
+<section id="tentang" class="py-24 bg-forest-950 light-mode:bg-white relative overflow-hidden">
     <div class="max-w-6xl mx-auto px-6">
         <div class="grid lg:grid-cols-2 gap-16 items-center">
             <div class="reveal-left">
@@ -603,7 +589,7 @@
 <!-- Di antara section satu dan section berikutnya -->
 <div class="section-divider"></div>
 <!-- ==================== MANFAAT ==================== -->
-<section id="manfaat" class="py-24 bg-forest-950 relative overflow-hidden light-mode:bg-white parallax-element">
+<section id="manfaat" class="py-24 bg-forest-950 relative overflow-hidden light-mode:bg-white">
     <div class="max-w-6xl mx-auto px-6">
         <div class="text-center mb-16 reveal">
             <span class="text-xs font-bold text-forest-500 tracking-[0.2em] uppercase mb-4 block light-mode:text-green-600" data-i18n="manfaat_label">Manfaat Nyata</span>
@@ -1184,7 +1170,6 @@ const App = {
                 sending: "Mengirim...", success_db: ", data tersimpan ke Database.",
                 success_no_db: ", Anda telah terdaftar sebagai relawan.",
                 err_connect: "Gagal terhubung ke Database.",
-                loading_text: "Memuat Gerakan Sejuta Pohon...",
                 alur_label: "Alur Bergabung",
                 alur_title: 'Perjalanan Menjadi <span class="text-forest-400 light-mode:text-emerald-600">Pahlawan Hijau</span>',
                 alur_desc: "Prosesnya sederhana. Daftar, Tanam, dan Dapatkan penghargaan atas kontribusi Anda untuk bumi.",
@@ -1248,7 +1233,6 @@ const App = {
                 sending: "Sending...", success_db: ", data saved to Database.",
                 success_no_db: ", you are registered.",
                 err_connect: "Failed to connect to Database.",
-                loading_text: "Loading One Million Trees Movement...",
                 alur_label: "Join Flow",
                 alur_title: 'Journey to Become a <span class="text-forest-400 light-mode:text-emerald-600">Green Hero</span>',
                 alur_desc: "Simple process. Register, Plant, and Get rewarded for your contribution to the earth.",
@@ -1816,54 +1800,6 @@ window.closeDetail = function() {
         modal.classList.add('hidden');
     }, 300);
 }
-
-
-
-// --- PARALLAX SCROLLING EFFECT ---
-document.addEventListener('DOMContentLoaded', () => {
-    const parallaxElements = document.querySelectorAll('.parallax-element');
-    const parallaxBg = document.querySelector('.parallax-bg');
-    
-    let ticking = false;
-    
-    const updateParallax = () => {
-        const scrolled = window.pageYOffset;
-        const rate = scrolled * -0.5;
-        
-        // Update background parallax
-        if (parallaxBg) {
-            parallaxBg.style.transform = `translate3d(0, ${rate}px, 0)`;
-        }
-        
-        // Update element parallax
-        parallaxElements.forEach((element, index) => {
-            const speed = (index + 1) * 0.3;
-            const yPos = -(scrolled * speed);
-            element.style.transform = `translate3d(0, ${yPos}px, 0)`;
-        });
-        
-        ticking = false;
-    };
-    
-    const requestTick = () => {
-        if (!ticking) {
-            window.requestAnimationFrame(updateParallax);
-            ticking = true;
-        }
-    };
-    
-    window.addEventListener('scroll', requestTick, { passive: true });
-});
-
-// --- HIDE LOADING OVERLAY ON PAGE LOAD ---
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        const loadingOverlay = document.getElementById('loading-overlay');
-        if (loadingOverlay) {
-            loadingOverlay.classList.add('hidden');
-        }
-    }, 1000);
-});
 
 // --- COMMENTS MODULE ---
 App.Comments = {
